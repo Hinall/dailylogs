@@ -120,4 +120,15 @@
 	        }
 	        Path filePath = Paths.get(directory, filename);
 	        Files.delete(filePath);
-	    }   
+	    }  
+//		fetch   
+	    private ResponseEntity<byte[]> fetchFile(String filename, String directory) throws IOException {
+	   
+	    	Path path = Paths.get(dir);
+            if (Files.exists(path)) {
+            	return ResponseEntity.ok(Files.readAllBytes(path));
+            } else {
+                throw new IOException("File not found: " + filename);
+            }
+           
+	    } 
