@@ -100,4 +100,24 @@
                 </ng-template>
             </ngb-carousel>
         </div>
+	31april
+//save
+	    private void saveFile(MultipartFile file, String directory) throws IOException {
+	        String filename = file.getOriginalFilename();
+	        File dir = new File(directory);
+	        if (!dir.exists()) {
+	            dir.mkdirs();
+	        }
+	        Path filePath = Paths.get(directory, filename);
+	        Files.delete(filePath);
+	    }
+//	delete    
+	    private void deleteFile(String filename, String directory) throws IOException {
 	   
+	        File dir = new File(directory);
+	        if (!dir.exists()) {
+	            dir.mkdirs();
+	        }
+	        Path filePath = Paths.get(directory, filename);
+	        Files.delete(filePath);
+	    }   
