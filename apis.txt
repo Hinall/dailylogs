@@ -1204,6 +1204,842 @@
 
 <!-- <img src="http://localhost:8090/digitaltwin/dashboard/get_files/hh.png"> -->
 
+==========================================================================
+3-6-24
+CREATE TABLE public.tbl_web_announcement
+(
+    announcement_id serial NOT NULL ,
+    announcement_title text,
+    announcement_description text,
+    created_datetime timestamp with time zone,
+    latitude double precision,
+    longitude double precision,
+    address text,
+    announcement_datetime timestamp with time zone,
+    role_id integer,
+    CONSTRAINT tbl_web_announcement_pkey PRIMARY KEY (announcement_id),
+    CONSTRAINT role_id_fk FOREIGN KEY (role_id)
+        REFERENCES public.tbl_web_role_master (role_id)
+)
+✔
+
+
+CREATE OR REPLACE FUNCTION public.fn_web_crud_announcement_management(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_title text;
+	_description text;
+	_latitude double precision;
+	_longitude double precision;
+	_address text;
+	_role_id integer;
+	_announcement_datetime timestamp with time zone;
+			
+	sql_query text;
+	userJsonObject JSON;
+	_flag TEXT;
+	_filter TEXT DEFAULT '';
+	_CREATE_FLAG TEXT DEFAULT 'create';
+	_DELETE_FLAG TEXT DEFAULT 'delete';
+	_UPDATE_FLAG TEXT DEFAULT 'update';
+	_FETCH_FLAG TEXT DEFAULT 'fetch';
+
+BEGIN
+
+	 raise notice '%',userjson;
+	userJsonObject := cast(userjson AS JSON) :: JSON;
+	
+	_title:= userJsonObject ->>'title';
+	_description := userJsonObject ->>'description';
+	_latitude := userJsonObject ->>'latitude';
+	_longitude := userJsonObject ->>'longitude';
+	_address := userJsonObject ->>'address';
+	_role_id := userJsonObject ->>'role_id';
+	_announcement_datetime := userJsonObject ->>'announcement_datetime';
+	_flag := userJsonObject ->> 'flag';	
+
+	
+    raise notice '%',_title;
+    raise notice '%',_latitude;
+    raise notice '%',_role_id;
+
+	IF (_flag = _CREATE_FLAG)
+	THEN
+	 
+	 	IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE (announcement_title = ''|| _announcement_title ||'' OR announcement_datetime = ''|| _announcement_datetime||'')  ) 
+		THEN	
+        	raise notice 'announcement for same date and title is already exists';
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement for same date and title is already exists.'')::text as data;';
+		ELSE
+			INSERT INTO public.tbl_web_announcement(
+	         announcement_title, announcement_description, announcement_datetime ,latitude, longitude, address, role_id, created_datetime)
+	        VALUES ( ?, ?, ?, ?, ?, ?, ?, now());
+			sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Announcement created successfully created successfully'')::text as data;';			
+	END IF;
+		
+	ELSEIF (_flag = _UPDATE_FLAG)
+	THEN
+		IF EXISTS (SELECT user_id FROM public.tbl_user_master WHERE user_id = _user_id) 
+		THEN	
+			IF EXISTS (SELECT user_id FROM public.tbl_user_master WHERE user_id != _user_id AND (contact_no = ''|| _user_contact_no ||'' OR email_id = ''|| _user_email ||'')) THEN
+				sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''User name or email id is already Exists.'')::text as data;';
+			ELSE
+				UPDATE public.tbl_user_master
+				SET user_name = _user_name, 
+				--password = _user_password, 
+				-- name = _name, 
+				contact_no = _user_contact_no, 
+				email_id = _user_email, 
+				status = _status, 
+				role_id = _role_id, 
+				--is_delete = false, 
+				modified_on=now()
+				WHERE user_id = _user_id RETURNING user_id INTO _inserted_user_id;	
+				
+				UPDATE tbl_ward_assign_master set status = FALSE where fkuserid = _inserted_user_id;
+				FOR _ward_json IN SELECT * FROM json_array_elements((userJsonObject ->> 'ward_nos')::json)
+					LOOP
+						IF _ward_json ->> 'ward_no' IS NOT NULL THEN
+							_ward_no := _ward_json ->> 'ward_no';
+							
+							INSERT INTO tbl_ward_assign_master (fkuserid,wardno,status,created_datetime) 
+								values (_inserted_user_id,_ward_no,TRUE,now());
+
+						END IF;
+				END LOOP;
+				
+				
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''User details updated successfully'')::text as data;';
+			END IF;	
+			
+		ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''User is not available.'')::text as data;';
+		END IF;
+		
+	ELSEIF(_flag = _UPDATE_STATUS_FLAG) --- FOR UPDATE STATUS OF USER select * from tbl_user_master
+	THEN
+		IF EXISTS (SELECT user_id FROM public.tbl_user_master WHERE user_id = _user_id)
+		THEN
+			UPDATE public.tbl_user_master
+			SET status = _status
+			WHERE user_id = _user_id;
+			sql_query :=  'SELECT json_build_object(''responseCode'',200,''responseMessage'',''User Status Update successfully.'')::text as data;';
+		ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''User is not available.'')::text as data;';
+		
+	END IF;
+	ELSEIF (_flag = _DELETE_FLAG) ---- FOR DELETE USER
+	THEN
+
+		IF EXISTS (SELECT user_id FROM public.tbl_user_master WHERE user_id = _user_id) 
+		THEN	
+
+			UPDATE public.tbl_user_master
+			SET status = _status,
+			is_delete = true
+			WHERE user_id = _user_id;
+			sql_query :=  'SELECT json_build_object(''responseCode'',200,''responseMessage'',''User deleted successfully.'')::text as data;';
+		ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''User is not available.'')::text as data;';
+		END IF;
+	
+	ELSEIF (_flag = _FETCH_FLAG) ---- FOR FETCH USER
+	THEN
+		--_filter := ' AND tum.user_id != ' || _user_id ;
+		
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (
+			SELECT  
+			tum.user_id,
+			tum.user_name,
+			tum.name,
+			tum.contact_no,
+			tum.email_id,
+			(SELECT role_name FROM tbl_role_master WHERE role_id = tum.role_id::INTEGER) AS role_name,
+			tum.status,
+			tum.role_id,
+			
+			(array_to_json(array( select json_build_object(''ward_no'',wam.wardno)							
+				FROM public.tbl_ward_assign_master AS wam
+				LEFT JOIN public.tbl_user_master um ON
+				wam.fkuserid::integer = tum.user_id::integer
+				WHERE um.user_id::integer = wam.fkuserid::integer and wam.status is TRUE
+			))) AS ward_data
+			 
+			-- (array_to_json(array( select json_build_object(''ward_no'',wam.wardno)							
+			--	FROM public.tbl_user_master AS tum
+			--	LEFT JOIN public.tbl_ward_assign_master AS wam ON
+			--	wam.fkuserid::integer = tum.user_id::integer
+			--	WHERE wam.fkuserid::integer = tum.user_id::integer and wam.status is TRUE
+			--))) AS ward_data
+			 
+			from tbl_user_master tum  WHERE is_delete is false
+			--'||_filter||'
+			)data1;';																								   
+	END IF;
+		
+	RETURN QUERY EXECUTE sql_query;
+
+	EXCEPTION WHEN OTHERS 
+	THEN
+		DECLARE p_errormessage VARCHAR(4000);
+		DECLARE p_errorstate VARCHAR(4000);
+		DECLARE p_errorline VARCHAR(4000);
+
+		BEGIN									
+			p_errormessage:= SQLERRM;
+			p_errorstate:= SQLSTATE;
+			GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+				
+			INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+			SELECT p_errorline,p_errormessage||':fn_web_crud_surveyor_management',p_errorstate,timezone('Asia/Kolkata'::text, now());
+			
+			sql_query := 'SELECT json_build_object(''responseCode'',201,''data'',''failed'', ''responseMessage'', '''||p_errormessage||''')::text as data';
+	END;
+	RETURN QUERY EXECUTE sql_query;
+END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_crud_surveyor_management(text)
+    OWNER TO postgres;
+✔
+
+
+CREATE OR REPLACE FUNCTION public.fn_web_crud_announcement(
+	jsondata text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE		
+		
+			-- 03-06-24
+		
+			-- SELECT public.fn_add_announcements('{"title":"Announcement 1","description":"Announcement description","user_id":1,"latitude":"22.723228", "longitude":"75.875230","address":"Test 123","department_id":1,"announcement_datetime":"2019-12-27 12:12:12"}');
+			
+			json_data json;
+			_title text;
+			_description text;
+			_user_id integer;
+			_latitude double precision;
+			_longitude double precision;
+			_address text;
+			_role_id integer;
+			_announcement_datetime timestamp with time zone;		
+			sql_query TEXT;
+	BEGIN         		
+			json_data := cast(jsondata as json) :: json;
+			_title := json_data ->> 'announcement_title';
+			_description := json_data ->> 'announcement_description';
+			_user_id := json_data ->> 'user_id';
+			_latitude := json_data ->> 'latitude';
+			_longitude := json_data ->> 'longitude';
+			_address := json_data ->> 'address';
+			_department_id := json_data ->> 'department_id';
+			_announcement_datetime := json_data ->> 'announcement_datetime';
+			
+			INSERT INTO public.tbl_announcement
+			(announcement_title, announcement_description, created_datetime, user_id, latitude, longitude, address, department_id, announcement_datetime)
+			VALUES
+			(_title, _description, now(), _user_id, _latitude, _longitude, _address, _department_id, _announcement_datetime)
+			RETURNING announcement_id INTO _id;
+			
+			IF _id != 0
+			THEN
+				sql_query := 'SELECT json_build_object(''responseCode'', 200, ''responseMessage'',''Announcement added successfully.'') :: text';
+			ELSE
+				sql_query := 'SELECT json_build_object(''responseCode'', 204, ''responseMessage'',''Error while data insertion'') :: text';
+			END IF;
+			RETURN QUERY EXECUTE sql_query;	
+
+
+------------✨		THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id  ))
+			THEN
+				UPDATE public.tbl_web_announcement
+				SET announcement_title  = _announcement_title   	,         
+				announcement_description= _announcement_description	,
+				created_datetime        = _created_datetime			,		
+                latitude                = _latitude					,
+                longitude 				= _longitude				,
+                address 				= _address					,
+                announcement_datetime	= _announcement_datetime	,
+                role_id 				= _role_id
+
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement updated successfully'')::text as data;';
+			ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+			END IF;	
+------------✨	
+
+CREATE OR REPLACE FUNCTION public.fn_web_crud_announcement_management(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_announcement_title text;
+	_announcement_description text;
+	_latitude double precision;
+	_longitude double precision;
+	_address text;
+	_role_id integer;
+	_announcement_datetime timestamp with time zone;
+	_announcement_id int;
+			
+	sql_query text;
+	userJsonObject JSON;
+	_flag TEXT;
+	_filter TEXT DEFAULT '';
+	_CREATE_FLAG TEXT DEFAULT 'create';
+	_DELETE_FLAG TEXT DEFAULT 'delete';
+	_UPDATE_FLAG TEXT DEFAULT 'update';
+	_FETCH_FLAG TEXT DEFAULT 'fetch';
+
+BEGIN
+-- 	select * from tbl_web_announcement
+	raise notice '%',userjson;
+	userJsonObject := cast(userjson AS JSON) :: JSON;
+    
+	_announcement_title := userJsonObject ->> 'announcement_title';
+    RAISE NOTICE 'announcement_title: %', _announcement_title;
+
+    _announcement_description := userJsonObject ->> 'announcement_description';
+    RAISE NOTICE 'announcement_description: %', _announcement_description;
+
+    _latitude := userJsonObject ->> 'latitude';
+    RAISE NOTICE 'latitude: %', _latitude;
+
+    _longitude := userJsonObject ->> 'longitude';
+    RAISE NOTICE 'longitude: %', _longitude;
+
+    _address := userJsonObject ->> 'address';
+    RAISE NOTICE 'address: %', _address;
+
+    _role_id := (userJsonObject ->> 'role_id')::INT;
+    RAISE NOTICE 'role_id: %', _role_id;
+
+    _announcement_datetime := userJsonObject ->> 'announcement_datetime';
+    RAISE NOTICE 'announcement_datetime: %', _announcement_datetime;
+
+    _flag := userJsonObject ->> 'flag';
+    RAISE NOTICE 'flag: %', _flag;
+
+    _announcement_id := (userJsonObject ->> 'announcement_id')::INT;
+    RAISE NOTICE 'announcement_id: %', _announcement_id;
+	
+	IF (_flag = _CREATE_FLAG)-- insert
+	THEN
+	 	IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE (announcement_title = ''|| _announcement_title ||'' OR announcement_datetime = ''|| _announcement_datetime||'')  ) 
+		THEN	
+        	raise notice 'announcement for same date and title is already exists';
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement for same date and title is already exists.'')::text as data;';
+		ELSE
+			INSERT INTO public.tbl_web_announcement(
+	         			announcement_title, announcement_description, announcement_datetime , latitude,  longitude,  address,  role_id, created_datetime)
+	        VALUES (_announcement_title,   _announcement_description, _announcement_datetime ,_latitude, _longitude, _address, _role_id, now());
+			sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Announcement created successfully created successfully'')::text as data;';			
+			raise notice 'announcement inserted';
+		END IF;
+	ELSEIF (_flag = _UPDATE_FLAG)
+	THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id  )
+			THEN
+				UPDATE public.tbl_web_announcement
+				SET announcement_title  = _announcement_title   	,         
+				announcement_description= _announcement_description	,
+				created_datetime        = _created_datetime			,		
+                latitude                = _latitude					,
+                longitude 				= _longitude				,
+                address 				= _address					,
+                announcement_datetime	= _announcement_datetime	,
+                role_id 				= _role_id;
+
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement updated successfully'')::text as data;';
+				raise notice 'announcement updated';
+			ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+			raise notice 'announcement not updated';
+			END IF;
+	ELSEIF (_flag = _DELETE_FLAG)--delete
+	THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id ) THEN
+				DELETE FROM public.tbl_web_announcement 
+				WHERE announcement_id = _announcement_id;
+							sql_query :=  'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement deleted successfully.'')::text as data;';
+							raise notice 'announcement delete';
+			ELSE
+							sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+							raise notice 'announcement noot updated';
+			END IF;		
+	ELSEIF (_flag = _FETCH_FLAG) ---- FOR FETCH by id
+	THEN
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (
+			SELECT  
+			    announcement_title,  
+				announcement_description,
+				created_datetime,        
+				latitude ,               
+				longitude 	,			
+				address ,				
+				announcement_datetime	,
+				role_id 				
+			    from tbl_web_announcement  WHERE announcement_id = _announcement_id
+		     )data1;';
+		raise notice 'announcement fetch by id';	 
+			
+	ELSEIF (_flag = _FETCH_FLAG) ---- FOR FETCH all data 
+	THEN
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (SELECT 
+			    announcement_title,  
+				announcement_description,
+				created_datetime,        
+				latitude ,               
+				longitude 	,			
+				address ,				
+				announcement_datetime	,
+				role_id 				
+			    from tbl_web_announcement )data1;';  
+		   raise notice 'announcement fetch all';	 
+	END IF;
+		
+	RETURN QUERY EXECUTE sql_query;
+		raise notice 'locha hai';
+	EXCEPTION WHEN OTHERS 
+	THEN
+		DECLARE p_errormessage VARCHAR(4000);
+		DECLARE p_errorstate VARCHAR(4000);
+		DECLARE p_errorline VARCHAR(4000);
+
+		BEGIN									
+			p_errormessage:= SQLERRM;
+			p_errorstate:= SQLSTATE;
+			GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+				
+			INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+			SELECT p_errorline,p_errormessage||':fn_web_crud_announcement_management',p_errorstate,timezone('Asia/Kolkata'::text, now());
+			
+			sql_query := 'SELECT json_build_object(''responseCode'',201,''data'',''failed'', ''responseMessage'', '''||p_errormessage||''')::text as data';
+	END;
+	RETURN QUERY EXECUTE sql_query;
+END;
+$BODY$;
+
+--------------
+select fn_web_crud_announcement_management('{
+										   "flag":"create",
+										   "announcement_title":"meeting", 
+										   "announcement_description":"meeting1", 
+										   "announcement_datetime":"3-6-2024" , 
+										   "latitude":"22.723228",  
+										   "longitude":"75.875230",  
+										   "address":"test",  
+										   "role_id":"2"}')
+-- 										   select * from tbl_web_role_master
+-- select * from tbl_web_announcement
+SELECT * FROM tbl_error_log ORDER BY created_on DESC LIMIT 10
+
+
+✔ CREATED SP
+✔TESTING FOR INSERT
+
+
+CREATE OR REPLACE FUNCTION public.fn_web_crud_announcement_management(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_announcement_title text;
+	_announcement_description text;
+	_latitude double precision;
+	_longitude double precision;
+	_address text;
+	_role_id integer;
+	_announcement_datetime timestamp with time zone;
+	_announcement_id int;
+			
+	sql_query text;
+	userJsonObject JSON;
+	_flag TEXT;
+	_filter TEXT DEFAULT '';
+	_CREATE_FLAG TEXT DEFAULT 'create';
+	_DELETE_FLAG TEXT DEFAULT 'delete';
+	_UPDATE_FLAG TEXT DEFAULT 'update';
+	_FETCH_FLAG TEXT DEFAULT 'fetch';
+	_FETCHID_FLAG TEXT DEFAULT 'fetch_id';
+
+BEGIN
+-- 	select * from tbl_web_announcement
+--  select fn_web_crud_announcement_management('{"flag":"create","announcement_title":"meeting2","announcement_description":"meeting2","announcement_datetime":"2222-02-02","latitude":"22.723228","longitude":"75.875230","address":"test","role_id":"2"}')
+--  select fn_web_crud_announcement_management('{"flag":"update","announcement_id":"1","announcement_title":"meetingupdate","announcement_description":"meetingupd","announcement_datetime":"2222-02-02","latitude":"22.723228","longitude":"75.875230","address":"test","role_id":"2"}')
+--  select fn_web_crud_announcement_management('{"flag":"fetch_id","announcement_id":"1"}')
+--  select fn_web_crud_announcement_management('{"flag":"fetch"}')
+--  select fn_web_crud_announcement_management('{"flag":"delete","announcement_id":"1"}')
+
+	raise notice '%',userjson;
+	userJsonObject := cast(userjson AS JSON) ;
+    
+	_announcement_title := userJsonObject ->> 'announcement_title';
+    RAISE NOTICE 'announcement_title: %', _announcement_title;
+
+    _announcement_description := userJsonObject ->> 'announcement_description';
+    RAISE NOTICE 'announcement_description: %', _announcement_description;
+
+    _latitude := userJsonObject ->> 'latitude';
+    RAISE NOTICE 'latitude: %', _latitude;
+
+    _longitude := userJsonObject ->> 'longitude';
+    RAISE NOTICE 'longitude: %', _longitude;
+
+    _address := userJsonObject ->> 'address';
+    RAISE NOTICE 'address: %', _address;
+
+    _role_id := (userJsonObject ->> 'role_id')::INT;
+    RAISE NOTICE 'role_id: %', _role_id;
+
+    _announcement_datetime :=  to_timestamp(userJsonObject ->> 'announcement_datetime', 'YYYY-MM-DD');
+    RAISE NOTICE 'announcement_datetime: %', _announcement_datetime;
+
+    _flag := userJsonObject ->> 'flag';
+    RAISE NOTICE 'flag: %', _flag;
+
+    _announcement_id := (userJsonObject ->> 'announcement_id')::INT;
+    RAISE NOTICE 'announcement_id: %', _announcement_id;
+	
+	IF (_flag = _CREATE_FLAG)-- insert
+	THEN
+	RAISE NOTICE 'ss';
+	 	IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE (announcement_title = ''|| _announcement_title ||'' AND announcement_datetime = _announcement_datetime)  ) 
+		THEN	
+        	raise notice 'announcement for same date and title is already exists';
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement for same date and title is already exists.'')::text as data;';
+		ELSE
+		RAISE NOTICE 'ss _>';
+			INSERT INTO public.tbl_web_announcement(
+	         			announcement_title, announcement_description, announcement_datetime , latitude,  longitude,  address,  role_id, created_datetime)
+	        VALUES (_announcement_title,   _announcement_description, _announcement_datetime ,_latitude, _longitude, _address, _role_id, now());
+			sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Announcement created successfully created successfully'')::text as data;';			
+			raise notice 'announcement inserted';
+		END IF;
+	ELSEIF (_flag = _UPDATE_FLAG)
+	THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id  )
+			THEN
+				UPDATE public.tbl_web_announcement
+				SET announcement_title  = _announcement_title   	,         
+				announcement_description= _announcement_description	,
+                latitude                = _latitude					,
+                longitude 				= _longitude				,
+                address 				= _address					,
+                announcement_datetime	= _announcement_datetime	,
+                role_id 				= _role_id;
+
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement updated successfully'')::text as data;';
+				raise notice 'announcement updated';
+			ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+			raise notice 'announcement not updated';
+			END IF;
+	ELSEIF (_flag = _DELETE_FLAG)--delete
+	THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id ) THEN
+				DELETE FROM public.tbl_web_announcement 
+				WHERE announcement_id = _announcement_id;
+							sql_query :=  'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement deleted successfully.'')::text as data;';
+							raise notice 'announcement delete';
+			ELSE
+							sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+							raise notice 'announcement noot updated';
+			END IF;		
+	ELSEIF (_flag = _FETCHID_FLAG) ---- FOR FETCH by id
+	THEN
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (
+			SELECT  
+			    announcement_title,  
+				announcement_description,
+				created_datetime,        
+				latitude ,               
+				longitude 	,			
+				address ,				
+				announcement_datetime	,
+				role_id 				
+			    from tbl_web_announcement  WHERE announcement_id ='''|| _announcement_id||'''
+		     )data1;';
+		raise notice 'announcement fetch by id';	 
+			
+	ELSEIF (_flag = _FETCH_FLAG) ---- FOR FETCH all data 
+	THEN
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (SELECT 
+			    announcement_title,  
+				announcement_description,
+				created_datetime,        
+				latitude ,               
+				longitude 	,			
+				address ,				
+				announcement_datetime	,
+				role_id 				
+			    from tbl_web_announcement )data1;';  
+		   raise notice 'announcement fetch all';	 
+	END IF;
+		
+	RETURN QUERY EXECUTE sql_query;
+		raise notice 'locha hai';
+	EXCEPTION WHEN OTHERS 
+	THEN
+		DECLARE p_errormessage VARCHAR(4000);
+		DECLARE p_errorstate VARCHAR(4000);
+		DECLARE p_errorline VARCHAR(4000);
+
+		BEGIN									
+			p_errormessage:= SQLERRM;
+			p_errorstate:= SQLSTATE;
+			GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+				
+			INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+			SELECT p_errorline,p_errormessage||':fn_web_crud_announcement_management',p_errorstate,timezone('Asia/Kolkata'::text, now());
+			
+			sql_query := 'SELECT json_build_object(''responseCode'',201,''data'',''failed'', ''responseMessage'', '''||p_errormessage||''')::text as data';
+	END;
+	RETURN QUERY EXECUTE sql_query;
+END;
+$BODY$;
+
+
+-- 	select * from tbl_web_announcement
+--  select fn_web_crud_announcement_management('{"flag":"create","announcement_title":"meeting2","announcement_description":"meeting2","announcement_datetime":"2222-02-02","latitude":"22.723228","longitude":"75.875230","address":"test","role_id":"2"}')
+--  select fn_web_crud_announcement_management('{"flag":"update","announcement_id":"1","announcement_title":"meetingupdate","announcement_description":"meetingupd","announcement_datetime":"2222-02-02","latitude":"22.723228","longitude":"75.875230","address":"test","role_id":"2"}')
+--  select fn_web_crud_announcement_management('{"flag":"fetch_id","announcement_id":"1"}')
+--  select fn_web_crud_announcement_management('{"flag":"fetch"}')
+--  select fn_web_crud_announcement_management('{"flag":"delete","announcement_id":"1"}')
+✔all test done
+	@ApiIgnore
+	@RequestMapping(value = "/announcment_management", method = RequestMethod.POST)
+	public ResponseEntity<?> getAnnouncementDetails(@RequestBody String json, HttpServletRequest request ) {
+		try {
+			String result = dashService.getAnnouncementDetails(json);
+			return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_500));
+		}
+------
+	@ApiIgnore
+	@RequestMapping(value = "/announcment_management", method = RequestMethod.POST)
+	public ResponseEntity<?> getAnnouncementDetails(@RequestBody String json, HttpServletRequest request ) {
+		try {
+			String result = dashService.getAnnouncementDetails(json);
+			return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_500));
+		}
+	
+	✔API CREATED 
+========================================5-6--24
+✔modified fetchid field
+
+
+CREATE OR REPLACE FUNCTION public.fn_web_crud_announcement_management(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_announcement_title text;
+	_announcement_description text;
+	_latitude double precision;
+	_longitude double precision;
+	_address text;
+	_role_id integer;
+	_announcement_datetime timestamp with time zone;
+	_announcement_id int;
+			
+	sql_query text;
+	userJsonObject JSON;
+	_flag TEXT;
+	_filter TEXT DEFAULT '';
+	_CREATE_FLAG TEXT DEFAULT 'create';
+	_DELETE_FLAG TEXT DEFAULT 'delete';
+	_UPDATE_FLAG TEXT DEFAULT 'update';
+	_FETCH_FLAG TEXT DEFAULT 'fetch';
+	_FETCHID_FLAG TEXT DEFAULT 'fetch_id';
+
+BEGIN
+-- 	select * from tbl_web_announcement
+--  select fn_web_crud_announcement_management('{"flag":"create","announcement_title":"meeting2","announcement_description":"meeting2","announcement_datetime":"2222-02-02","latitude":"22.723228","longitude":"75.875230","address":"test","role_id":"2"}')
+--  select fn_web_crud_announcement_management('{"flag":"update","announcement_id":"1","announcement_title":"meetingupdate","announcement_description":"meetingupd","announcement_datetime":"2222-02-02","latitude":"22.723228","longitude":"75.875230","address":"test","role_id":"2"}')
+--  select fn_web_crud_announcement_management('{"flag":"fetch_id","announcement_id":"1"}')
+--  select fn_web_crud_announcement_management('{"flag":"fetch"}')
+--  select fn_web_crud_announcement_management('{"flag":"delete","announcement_id":"1"}')
+
+	raise notice '%',userjson;
+	userJsonObject := cast(userjson AS JSON) ;
+    
+	_announcement_title := userJsonObject ->> 'announcement_title';
+    RAISE NOTICE 'announcement_title: %', _announcement_title;
+
+    _announcement_description := userJsonObject ->> 'announcement_description';
+    RAISE NOTICE 'announcement_description: %', _announcement_description;
+
+    _latitude := userJsonObject ->> 'latitude';
+    RAISE NOTICE 'latitude: %', _latitude;
+
+    _longitude := userJsonObject ->> 'longitude';
+    RAISE NOTICE 'longitude: %', _longitude;
+
+    _address := userJsonObject ->> 'address';
+    RAISE NOTICE 'address: %', _address;
+
+    _role_id := (userJsonObject ->> 'role_id')::INT;
+    RAISE NOTICE 'role_id: %', _role_id;
+
+    _announcement_datetime :=  to_timestamp(userJsonObject ->> 'announcement_datetime', 'YYYY-MM-DD');
+    RAISE NOTICE 'announcement_datetime: %', _announcement_datetime;
+
+    _flag := userJsonObject ->> 'flag';
+    RAISE NOTICE 'flag: %', _flag;
+
+    _announcement_id := (userJsonObject ->> 'announcement_id')::INT;
+    RAISE NOTICE 'announcement_id: %', _announcement_id;
+	
+	IF (_flag = _CREATE_FLAG)-- insert
+	THEN
+	RAISE NOTICE 'ss';
+	 	IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE (announcement_title = ''|| _announcement_title ||'' AND announcement_datetime = _announcement_datetime)  ) 
+		THEN	
+        	raise notice 'announcement for same date and title is already exists';
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement for same date and title is already exists.'')::text as data;';
+		ELSE
+		RAISE NOTICE 'ss _>';
+			INSERT INTO public.tbl_web_announcement(
+	         			announcement_title, announcement_description, announcement_datetime , latitude,  longitude,  address,  role_id, created_datetime)
+	        VALUES (_announcement_title,   _announcement_description, _announcement_datetime ,_latitude, _longitude, _address, _role_id, now());
+			sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Announcement created successfully created successfully'')::text as data;';			
+			raise notice 'announcement inserted';
+		END IF;
+	ELSEIF (_flag = _UPDATE_FLAG)
+	THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id  )
+			THEN
+				UPDATE public.tbl_web_announcement
+				SET announcement_title  = _announcement_title   	,         
+				announcement_description= _announcement_description	,
+                latitude                = _latitude					,
+                longitude 				= _longitude				,
+                address 				= _address					,
+                announcement_datetime	= _announcement_datetime	,
+                role_id 				= _role_id;
+
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement updated successfully'')::text as data;';
+				raise notice 'announcement updated';
+			ELSE
+			sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+			raise notice 'announcement not updated';
+			END IF;
+	ELSEIF (_flag = _DELETE_FLAG)--delete
+	THEN	
+			IF EXISTS (SELECT announcement_id FROM public.tbl_web_announcement WHERE announcement_id = _announcement_id ) THEN
+				DELETE FROM public.tbl_web_announcement 
+				WHERE announcement_id = _announcement_id;
+							sql_query :=  'SELECT json_build_object(''responseCode'',200,''responseMessage'',''announcement deleted successfully.'')::text as data;';
+							raise notice 'announcement delete';
+			ELSE
+							sql_query :=  'SELECT json_build_object(''responseCode'',201,''responseMessage'',''announcement is not available.'')::text as data;';
+							raise notice 'announcement noot updated';
+			END IF;		
+	ELSEIF (_flag = _FETCHID_FLAG) ---- FOR FETCH by id
+	THEN
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (
+			SELECT  
+			    announcement_title,  
+				announcement_description,
+				created_datetime,        
+				latitude ,               
+				longitude 	,			
+				address ,				
+				announcement_datetime	,
+				role_id ,
+				(SELECT role_name FROM tbl_web_role_master WHERE tbl_web_role_master.role_id = tbl_web_announcement.role_id) as role_name
+			    from tbl_web_announcement  WHERE announcement_id ='''|| _announcement_id||'''
+		     )data1;';
+		raise notice 'announcement fetch by id';	 
+			
+	ELSEIF (_flag = _FETCH_FLAG) ---- FOR FETCH all data 
+	THEN
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+		''[]''),''responseMessage'',''ok'')::text as data
+		FROM (SELECT 
+				announcement_id	,
+			    announcement_title,  
+				announcement_description,
+				created_datetime,        
+				latitude ,               
+				longitude 	,			
+				address ,				
+				announcement_datetime	,
+				role_id ,
+				(SELECT role_name FROM tbl_web_role_master WHERE tbl_web_role_master.role_id = tbl_web_announcement.role_id) as role_name
+			    from tbl_web_announcement )data1;';  
+		   raise notice 'announcement fetch all';	 
+	END IF;
+		
+	RETURN QUERY EXECUTE sql_query;
+		raise notice 'locha hai';
+	EXCEPTION WHEN OTHERS 
+	THEN
+		DECLARE p_errormessage VARCHAR(4000);
+		DECLARE p_errorstate VARCHAR(4000);
+		DECLARE p_errorline VARCHAR(4000);
+
+		BEGIN									
+			p_errormessage:= SQLERRM;
+			p_errorstate:= SQLSTATE;
+			GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+				
+			INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+			SELECT p_errorline,p_errormessage||':fn_web_crud_announcement_management',p_errorstate,timezone('Asia/Kolkata'::text, now());
+			
+			sql_query := 'SELECT json_build_object(''responseCode'',201,''data'',''failed'', ''responseMessage'', '''||p_errormessage||''')::text as data';
+	END;
+	RETURN QUERY EXECUTE sql_query;
+END;
+$BODY$;
+
+
 
 
 
