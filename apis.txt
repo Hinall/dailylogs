@@ -2044,3 +2044,371 @@ $BODY$;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=============================================================13/6/24
+-- FUNCTION: public.fn_web_search_layer(text)
+
+-- DROP FUNCTION public.fn_web_search_layer(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_search_layer(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_keyword text;
+	_table_name text;
+exists_flag BOOLEAN;
+			
+	sql_query text;
+	userJsonObject JSON;
+		--select * from public."metro_station_old" limit 10
+BEGIN	-- select from fn_web_search_layer('{"keyword":"mint","table_name":"metro_station_old"}')
+		-- SELECT * from tbl_parent_layer_master 
+	-- 		-- SELECT * from tbl_web_layer_master 
+		-- SELECT * from tbl_error_log order by created_on desc limit 10
+		
+-- 		SELECT json_build_object('responseCode', 200, 'data', COALESCE(to_json(array_agg(data1)), '[]'), 'responseMessage', 'ok')::text as data
+--                            FROM (
+--                                SELECT distinct ward,name,uid,layer,prabhag,height_m,zone,survey_status,geom FROM public.bridge_old WHERE name ILIKE  '%f%'
+--                            ) data1;
+
+	raise notice '%',userjson;
+   	userJsonObject=jsonb_strip_nulls(CAST(userjson AS JSONB));
+    RAISE NOTICE 'announcement_title: %', userJsonObject;
+	_keyword := userJsonObject ->> 'keyword';
+    RAISE NOTICE 'announcement_title: %', _keyword;
+	_table_name:= userJsonObject ->> 'table_name';
+    RAISE NOTICE 'announcement_title: %', _table_name;
+	
+	
+
+    EXECUTE format('
+        SELECT EXISTS (
+            SELECT 1 FROM %I WHERE REPLACE(REPLACE(name, '' '', ''''), ''_'', '''') ILIKE %L
+        )', _table_name, '%' || REPLACE(REPLACE(_keyword, ' ', ''), '_', '') || '%') INTO exists_flag;
+
+ 
+    IF exists_flag THEN
+        sql_query := format('
+            SELECT json_build_object(
+                ''responseCode'', 200, 
+                ''data'', COALESCE(to_json(array_agg(data1)), ''[]''), 
+                ''responseMessage'', ''ok''
+            )::text as data
+            FROM (
+                SELECT DISTINCT 
+                    gid,
+                    name,
+                    geom
+                FROM %I
+                WHERE REPLACE(REPLACE(name, '' '', ''''), ''_'', '''') ILIKE %L
+            ) data1;', 
+            _table_name, '%' || REPLACE(REPLACE(_keyword, ' ', ''), '_', '') || '%'
+        );
+
+        RAISE NOTICE 'Query: %', sql_query;
+        RAISE NOTICE 'Rows exist in table % matching the keyword %.', _table_name, _keyword;
+        RETURN QUERY EXECUTE sql_query;
+    ELSE
+        sql_query := '
+            SELECT json_build_object(
+                ''responseCode'', 201, 
+                ''responseMessage'', ''layer name does not exist.''
+            )::text as data;
+        ';
+
+        RAISE NOTICE 'No rows found in table % matching the keyword %.', _table_name, _keyword;
+        RETURN QUERY EXECUTE sql_query;
+    END IF;
+
+	RAISE NOTICE 'qq-> %' , sql_query;
+    -- Execute the query
+  
+    -- Execute the query
+
+	EXCEPTION WHEN OTHERS 
+	THEN
+		DECLARE p_errormessage VARCHAR(4000);
+		DECLARE p_errorstate VARCHAR(4000);
+		DECLARE p_errorline VARCHAR(4000);
+
+		BEGIN									
+			p_errormessage:= SQLERRM;
+			p_errorstate:= SQLSTATE;
+			GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+				
+			INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+			SELECT p_errorline,p_errormessage||':fn_web_search_layer',p_errorstate,timezone('Asia/Kolkata'::text, now());
+			
+			sql_query := 'SELECT json_build_object(''responseCode'',201,''data'',''failed'', ''responseMessage'', '''||p_errormessage||''')::text as data';
+	END;
+	RETURN QUERY EXECUTE sql_query;
+END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_search_layer(text)
+    OWNER TO postgres;
+
+````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+		@ApiIgnore
+	@RequestMapping(value = "/search_layer", method = RequestMethod.POST)
+	public ResponseEntity<?> searchLayer(@RequestBody String json, HttpServletRequest request ) {
+		try {
+			String result = dashService.searchLayer(json);
+			return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_500));
+		}
+	}
+````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+	@Override
+	public String searchLayer(String json) {
+		String result;
+		try {
+			result = jdbcTemplate.queryForObject(SPUtility.FN_WEB_SEARCH_LAYER, new Object[] { json },
+					String.class);
+			return result;
+		} catch (Exception e) {
+			LoggerUtil.setError(this.getClass(), "Error in getDrawFeatureData ");
+			e.printStackTrace();
+			return null;
+		}
+	}
+✔seach api
+
+________________________________________________________________________________________________________________________________________________________________________________
+14/6/24
+
+-- FUNCTION: public.fn_web_get_point_layer_data()
+
+-- DROP FUNCTION public.fn_web_get_point_layer_data();
+
+CREATE OR REPLACE FUNCTION public.fn_web_get_point_layer_data(
+	)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE-- SELECT fn_web_get_point_layer_data();
+			-- SELECT * from public.tbl_web_layer_master
+			-- SELECT * from tbl_error_log order by created_on desc limit 10
+			-- select * from ward_boundary
+			
+		sql_query text;
+		
+	BEGIN
+			
+
+			raise notice 'cs%', sql_query;
+			sql_query := 'SELECT json_build_object(''responseCode'', 200, ''data'', COALESCE(to_json(array_agg(data1)), ''[]''), ''responseMessage'', ''ok'')::text as data
+             FROM (
+                 SELECT
+                     id,
+                     layer_name,
+                     table_name,
+                     status,
+                     service_url
+                 FROM tbl_web_layer_master
+                 WHERE status IS TRUE
+                   AND geometry_type = ''Point''
+                 ORDER BY layer_name
+             ) data1;';
+
+		    raise notice '%', sql_query;
+		RETURN QUERY EXECUTE sql_query;							 
+			EXCEPTION WHEN OTHERS 
+			THEN
+				DECLARE p_errormessage VARCHAR(4000);
+				DECLARE p_errorstate VARCHAR(4000);
+				DECLARE p_errorline VARCHAR(4000);
+
+				BEGIN									
+					p_errormessage:= SQLERRM;
+					p_errorstate:= SQLSTATE;
+					GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+					INSERT INTO public.tbl_error_log(error_name,error_callstack,error_method,created_on)		
+					SELECT p_errorline,p_errormessage||':fn_web_get_point_layer_data',p_errorstate,timezone('Asia/Kolkata'::text, now());
+
+				END;
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';
+				RETURN QUERY EXECUTE sql_query;
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_get_point_layer_data()
+    OWNER TO postgres;
+`````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+	@ApiIgnore
+	@RequestMapping(value = "/get_point_layers", method = RequestMethod.GET)
+	public ResponseEntity<?> getPointLayer( HttpServletRequest request ) {
+		try {
+			String result = dashService.getPointLayer();
+			return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_500));
+		}
+	}
+```````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+	@Override
+	public String getPointLayer( ) {
+		String result;
+		try {
+			result = jdbcTemplate.queryForObject(SPUtility.FN_WEB_GET_POINT_LAYER, new Object[] {  },
+					String.class);
+			return result;
+		} catch (Exception e) {
+			LoggerUtil.setError(this.getClass(), "Error in getDrawFeatureData ");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+
+
+✔get point layer api done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+________________________________________________________________________________________________________________________________________________________________________________
+<div style="display:flex; justify-content: start;">
+  <kendo-dropdownlist rounded="full"
+  [data]="listItems"
+  [(ngModel)]="selectedValue" 
+>select</kendo-dropdownlist>
+<div ></div>
+<kendo-autocomplete #autocomplete [data]="searchResultNames"  (change)="onsearchchange($event)">
+</kendo-autocomplete>
+
+</div>
+✔added kendo auto complete search bar
+
+```````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+ getSearchResultNames(): any[] {
+    return this.searchResult.map(result => result.name);
+  }
+  onsearchchange(event: any) {
+    const searchKeyword = event.target.value;
+     this.searchResultNames = []; 
+    if (searchKeyword !== '') {
+      this.searchResult = []; 
+     
+      this.loading = true;
+  
+      console.log(this.layerData);
+      this.layerData.forEach(element => {
+        if (element.layer_name === this.selectedValue) {
+          
+            
+            const formData = {
+              "keyword":searchKeyword,
+              "table_name": element.table_name
+            };
+            console.log('formdata',formData)
+            this.commonService.searchChildlayer(JSON.stringify(formData)).subscribe(
+              (data: any) => {
+               
+                if (data.responseCode === 200) {
+                  const result = data.data;
+                  result.forEach(row=> {
+                    console.log("row",row);
+                    this.searchResult.push({name:row.name,geom:row.geom});
+                    console.log("search array",this.searchResult);
+                    this.searchResultNames.push(row.name);
+                  });
+                 
+                }
+                this.loading = false; // Reset loading state
+              },
+              (error) => {
+                console.error("API Error:", error);
+                this.toastr.error('Something went wrong while fetching roles.');
+                this.loading = false; // Reset loading state
+              }
+            );
+         
+      
+        }
+      });
+      console.log(this.searchResult);
+    }
+
+✔integrated ui with api
+
+🤔issue with getting data and loading into search bar -exploring alternatives
+
+
+
+
+
+
