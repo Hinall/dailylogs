@@ -2407,7 +2407,323 @@ ________________________________________________________________________________
 
 🤔issue with getting data and loading into search bar -exploring alternatives
 
+__________________________________________________________________________________________________________________________________________________________________________________________________________
 
+18/6/24
+// angular import
+import { Component, OnInit } from '@angular/core';
+
+// project import
+import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { MapController } from '../utils/mapController';
+import { DropDownsModule } from "@progress/kendo-angular-dropdowns";
+import { InputsModule } from "@progress/kendo-angular-inputs";
+
+import * as Cesium from 'cesium';
+import { CommonsService } from 'src/app/services/commons.service';
+import { ToastrService } from 'ngx-toastr';
+
+declare const AmCharts: any;
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [SharedModule, DropDownsModule, InputsModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  providers: [MapController]
+})
+export default class DashboardComponent implements OnInit {
+  foods = { "values": [1, 2, 3, 4] };
+  //public mapConroller: any;
+  public viewer: any;
+  selectedValue: any;
+  public listItems:Array<string> [];
+  searchList: Array<string> = [];
+  currentLayerName: any;
+  layerData: any;
+  searchResult: { name: any, geom: any }[] = [];
+  loading: boolean;
+  searchResultNames: any[] = [];
+  layerName: any;
+  constructor(private mapConroller: MapController, private commonService: CommonsService, private toastr: ToastrService) {
+    //this.mapConroller = mapConroller1;
+  }
+
+  ngOnInit() {
+    this.mapConroller.initMap();
+
+    this.mapConroller.temp_data_new();
+    this.loadDropdown();
+  }
+  loadDropdown() {
+    this.commonService.getLayerData().subscribe(
+      (data: any) => {
+        console.log("load layers", data);
+        if (data.responseCode === 200) {
+          this.layerData = data.data;
+          this.listItems = this.layerData.map(element => element.layer_name);
+          console.log('Loaded layer names:', this.listItems);
+        } else {
+          console.error("Error fetching layers:", data.responseMessage);
+          this.toastr.error('Error fetching layers');
+        }
+      },
+      (error) => {
+        console.error("API Error:", error);
+        this.toastr.error('Something went wrong while fetching layers.');
+      }
+    );
+  }
+  
+  onselect(parentlayer) {
+
+    if (parentlayer!='') {
+console.log(this.selectedValue);
+
+    }
+  }
+  getSearchResultNames(): any[] {
+    return this.searchResult.map(result => result.name);
+  }
+  onsearchchange(event: any) {
+    const searchKeyword = event.target.value;
+     this.searchResultNames = []; 
+    if (searchKeyword !== '') {
+      this.searchResult = []; 
+     
+      this.loading = true;
+  
+      console.log(this.layerData);
+      this.layerData.forEach(element => {
+        if (element.layer_name === this.selectedValue) {
+          
+            
+            const formData = {
+              "keyword":searchKeyword,
+              "table_name": element.table_name
+            };
+            console.log('formdata',formData)
+            this.commonService.searchChildlayer(JSON.stringify(formData)).subscribe(
+              (data: any) => {
+               
+                if (data.responseCode === 200) {
+                  const result = data.data;
+                  result.forEach(row=> {
+                    console.log("row",row);
+                    this.searchResult.push({name:row.name,geom:row.geom});
+                    console.log("search array",this.searchResult);
+                    this.searchResultNames.push(row.name);
+                  });
+                 
+                }
+                this.loading = false; // Reset loading state
+              },
+              (error) => {
+                console.error("API Error:", error);
+                this.toastr.error('Something went wrong while fetching roles.');
+                this.loading = false; // Reset loading state
+              }
+            );
+         
+      
+        }
+      });
+      console.log(this.searchResult);
+    }
+
+
+
+  }
+}
+
+```````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+<div style="display:flex; justify-content: start;">
+  
+
+
+  <kendo-dropdownlist rounded="full"
+  [data]="listItems"
+  [(ngModel)]="selectedValue" 
+>select</kendo-dropdownlist>
+
+<kendo-autocomplete
+  #autocomplete
+  [data]="searchResultNames"
+  (filterChange)="onSearchInputChange($event)"
+  [filterable]="true"
+
+  (valueChange)="onValueChange($event)"
+  [(value)]="selectedOption"
+ 
+></kendo-autocomplete>
+</div>
+
+
+<div id="cesiumContainer"></div>
+
+++++// angular import
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+
+// project import
+import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { MapController } from '../utils/mapController';
+import { DropDownsModule } from "@progress/kendo-angular-dropdowns";
+import { InputsModule } from "@progress/kendo-angular-inputs";
+
+import * as Cesium from 'cesium';
+import { CommonsService } from 'src/app/services/commons.service';
+import { ToastrService } from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { AutoCompleteComponent } from '@progress/kendo-angular-dropdowns';
+import { Subject, forkJoin, of } from 'rxjs';
+import {  Subscription } from 'rxjs';
+
+declare const AmCharts: any;
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [SharedModule, DropDownsModule, InputsModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  providers: [MapController]
+})
+export default class DashboardComponent implements OnInit, OnDestroy {
+  foods = { "values": [1, 2, 3, 4] };
+  //public mapConroller: any;
+  public viewer: any;
+  selectedValue: any;
+  public listItems: Array<string> = [];
+  searchList: Array<string> = [];
+  currentLayerName: any;
+  layerData: any;
+  searchResult: { name: any, geom: any }[] = [];
+  loading: boolean;
+  searchResultNames: any[] = [];
+  layerName: any;
+  
+  // searchInput = new Subject<string>();
+  private searchInput = new Subject<any>()
+  subscription: Subscription = this.searchInput.pipe(debounceTime(1200), distinctUntilChanged(), tap(value => console.log("debounced value: " + value))).subscribe();
+  @ViewChild('autocomplete', { static: true }) autocomplete: AutoCompleteComponent;
+  selectedGeom: any;
+  selectedName: any;
+  selectedOption:any;
+  
+  constructor(
+    private mapController: MapController, 
+    private commonService: CommonsService, 
+    private toastr: ToastrService
+  ) {
+    
+  }
+
+  ngOnInit() {
+    this.mapController.initMap();
+    this.mapController.temp_data_new();
+    this.loadDropdown();
+    this.searchInput.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((searchTerm: string) => of(this.performSearch(searchTerm)))
+    ).subscribe();
+  }
+  
+  ngOnDestroy() {
+    this.searchInput.complete();
+  }
+  
+  loadDropdown() {
+    this.commonService.getLayerData().subscribe(
+      (data: any) => {
+        console.log("load layers", data);
+        if (data.responseCode === 200) {
+          this.layerData = data.data;
+          this.listItems = this.layerData.map(element => element.layer_name);
+          console.log('Loaded layer names:', this.listItems);
+        } else {
+          console.error("Error fetching layers:", data.responseMessage);
+          this.toastr.error('Error fetching layers');
+        }
+      },
+      (error) => {
+        console.error("API Error:", error);
+        this.toastr.error('Something went wrong while fetching layers.');
+      }
+    );
+  }
+  
+  onSearchInputChange(eventValue: any) {
+    
+    this.searchInput.next(eventValue)
+
+    console.log("logging search value", eventValue);
+    console.log("selectedOption", this.selectedOption);
+
+    this.performSearch(eventValue);
+ 
+    
+  }
+  onValueChange(event: string) {
+    const selectedItem = this.searchResult.find(item => item.name === event);
+    if (selectedItem) {
+      this.selectedValue = selectedItem;
+      alert(`Selected: ${selectedItem.name}`);
+    }
+  }
+  onSelectionChange() {
+    // alert(this.selectedOption);
+    // const selectedItem = this.searchResult.find(item => item.name === event);
+    // if (selectedItem) {
+    //   this.selectedValue = selectedItem;
+    // }
+  }
+
+  performSearch(searchTerm: string) {
+    const matchingLayers = this.layerData.filter(element => element.layer_name === this.selectedValue);
+    this.searchResult = [];
+    this.searchResultNames = [];
+    this.loading = true; 
+    const searchObservables = matchingLayers.map(element => {
+      const formData = {
+        keyword: searchTerm,
+        table_name: element.table_name
+      };
+      return this.commonService.searchChildlayer(JSON.stringify(formData));
+    });
+    // ForkJoin to wait for all observables to complete
+    forkJoin(searchObservables).subscribe(
+      (results: any[]) => {
+        results.forEach(data => {
+          if (data.responseCode === 200) {
+            const result = data.data;
+            console.log('search result',result)
+            result.forEach(row => {
+              this.searchResult.push({ name: row.name, geom: row.geom });
+              console.log('searchResult result',this.searchResult)
+              this.searchResultNames.push(row.name);
+
+              console.log('searchResultNames result', this.searchResultNames)
+            });
+          } else {
+            console.error("API Error:", data); // Log API error
+            this.toastr.error('name not found');
+          }
+        });
+        this.loading = false; // Reset loading state
+      },
+      error => {
+        console.error("API Error:", error);
+        this.toastr.error('Something went wrong while fetching data.');
+        this.loading = false; // Reset loading state
+      }
+    );
+  }
+
+  
+}
+✔debouncing done
 
 
 
