@@ -2728,3 +2728,2102 @@ export default class DashboardComponent implements OnInit, OnDestroy {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+____________________________________________________________________________________________________________________________________________________________________________________
+19/6/24
+
+moving search from dashboard
+
+
+<!-- <div appCesium></div> -->
+<div style="display:flex; justify-content: start;">
+  
+
+
+  <kendo-dropdownlist rounded="full"
+  [data]="listItems"
+  [(ngModel)]="selectedValue" 
+>select</kendo-dropdownlist>
+
+<kendo-autocomplete
+  #autocomplete
+  [data]="searchResultNames"
+  (filterChange)="onSearchInputChange($event)"
+  [filterable]="true"
+
+  (valueChange)="onValueChange($event)"
+  [(value)]="selectedOption"
+ 
+></kendo-autocomplete>
+</div>
+<div id="map"></div>
+
+<div class="SubCursorBar">
+  <div class="content">
+    <div class="DisabledContent" is-disabled="false">
+      <div class="CursorBarControl" is-disabled="false" is-selected="true" title="Pan">
+        
+        <mat-button-toggle-group name="ingredients" aria-label="Ingredients">
+          <mat-button-toggle (click)="gotoFtn()"  title="Go-To"><i class="fas fa-map-marker-alt fa-2x"></i></mat-button-toggle>
+          <mat-button-toggle (click)="addLineStringMeasurement()"  title="LineString"><mat-icon>timeline</mat-icon></mat-button-toggle>
+          <mat-button-toggle (click)="addPolygonMeasurement()" title="Polygon" ><i class="fas fa-draw-polygon fa-2x"></i></mat-button-toggle>
+            <mat-button-toggle (click)="featureInfo()" title="Info"><mat-icon>info</mat-icon></mat-button-toggle>
+            <mat-button-toggle title="Take Screenshot" (click)="takeSS()"><i class="fas fa-camera-retro fa-2x"></i></mat-button-toggle>
+            <mat-button-toggle (click)="clearDrawnFeature()" title="Erase"><i class="fas fa-eraser fa-2x"></i></mat-button-toggle>
+       
+        </mat-button-toggle-group>
+      </div>
+    </div>
+    </div>
+</div>
+
+<button type="button" (click)="togglePanel()">Layer</button>
+<div class="row" [@widthGrow]="state">
+  <div class="col-sm-12">
+
+    <div class="layer-popup resize-popup" id="layers">
+      <div class="layers" id="layersheader">
+        <div class="layer-title-main w-100 align-items-center">
+          <h3 class="layer-title me-auto">
+            <label id="total_layer_cnt" style="color: aliceblue;" data-translate="_layer_popup">Layer</label>
+          </h3> 
+
+          <a class="layer-close side-layer-resize ms-2 me-2" href="javascript:void(0);">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+              id="Layer_1" x="0px" y="0px" width="16" height="16" viewBox="0 0 50 50" enable-background="new 0 0 50 50"
+              xml:space="preserve">
+              <g>
+                <g>
+
+                  <polyline fill-rule="evenodd" clip-rule="evenodd" fill="none" stroke="#FFFFFF" stroke-width="3.5"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="22.9256"
+                    points="    47.5,1.832 22.191,27.15 22.191,16.419   " />
+
+                  <line fill-rule="evenodd" clip-rule="evenodd" fill="none" stroke="#FFFFFF" stroke-width="3.5"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="22.9256" x1="22.191" y1="27.15"
+                    x2="32.919" y2="27.15" />
+                </g>
+
+                <polyline fill-rule="evenodd" clip-rule="evenodd" fill="none" stroke="#FFFFFF" stroke-width="3.5"
+                  stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="22.9256"
+                  points="   44.878,18.451 44.878,48.168 2.5,48.168 2.5,5.802 31.722,5.802  " />
+              </g>
+            </svg>
+          </a>
+
+        </div>
+        <div class="layer-content" id="layer_master">
+          <div class="accordion" id="accordionExample">
+            <div *ngFor="let parentLayer of data.data">
+              <div class='accordion-item'>
+                <h2 class='accordion-header'>
+                  <button class='accordion-button collapsed' type='button'
+                    (click)="toggleCollapse(parentLayer.parent_layer_id)">
+                    {{ parentLayer.parent_layer_name }}
+                  </button>
+                </h2>
+                <div [id]="'panelsStayOpen-collapse' + parentLayer.parent_layer_id" class='accordion-collapse collapse'>
+                  <div class='accordion-body'>
+                    <div *ngFor="let childLayer of parentLayer.child_layer">
+                      <div class="form-check">
+                        <input class="form-check-input" name="child_layer_name" (change)="showHideData($event)"
+                        [attr.layer_id]="childLayer.layer_id"
+                          [attr.mobile_service_url]="childLayer.mobile_service_url"
+                          [attr.parent_layer]="childLayer.parent_layer" [attr.defination]="childLayer.defination"
+                          [attr.layer_name]="childLayer.layer_name"
+                          [attr.combined_service]="childLayer.is_combined_service"
+                          [attr.service-url]="childLayer.service_url" [attr.dataid]="childLayer.geometry_type"
+                          data-id="Image" type="checkbox" [attr.value]="childLayer.layer_id"
+                          [attr.Id]="'flexCheckDefault' + childLayer.layer_id"
+                          [attr.layer_name]="childLayer.layer_name">
+                        <label class="form-check-label">{{ childLayer.layer_name }}</label>
+                      </div>
+                    </div>  
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+=================================================
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common'; import { NgModule } from '@angular/core';
+import { trigger, transition, style, animate, state } from '@angular/animations';
+import * as glob from '../../../environments/environment';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { CommonsService } from 'src/app/services/commons.service';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import axios from 'axios';
+import html2canvas from 'html2canvas';
+// search 
+import { ToastrService } from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { AutoCompleteComponent } from '@progress/kendo-angular-dropdowns';
+import { Subject, forkJoin, of } from 'rxjs';
+import {  Subscription } from 'rxjs';
+import { DropDownsModule } from "@progress/kendo-angular-dropdowns";
+import { InputsModule } from "@progress/kendo-angular-inputs";
+
+
+@Component({
+  selector: 'app-map',
+  standalone: true,
+  imports: [SharedModule, MatButtonToggleModule, MatIconModule,SharedModule, DropDownsModule, InputsModule],
+  templateUrl: './2d.component.html',
+  styleUrls: ['./2d.component.scss'],
+  animations: [
+    trigger('widthGrow', [
+      state('closed', style({
+        height: 0,
+      })),
+      state('open', style({
+        height: 500
+      })),
+      transition('* => *', animate(900))
+    ]),
+  ]
+})
+
+export default class _2D {
+  
+  data: any;
+  ol: any = window['ol'];
+  state = "closed";
+  osm: any;
+  map: any;
+  table_name: any
+  mobile_service_url: any
+  current_layer: any;
+  layer_id: any
+  Measuredraw: any = null;
+  GoToVectorLayer: any = null;
+  location_mark : any;
+  view: any;
+  clickHandler: any;
+
+  curr_layer_source_arr: any[] = [];
+  curr_layer_source: any =  null;
+  goto_click = false;
+  info_click = false;
+
+  projection = this.ol.proj.get('EPSG:3857');
+  projectionExtent = this.projection.getExtent();
+  size = this.ol.extent.getWidth(this.projectionExtent) / 256;
+  resolutions = new Array(25);
+  matrixIds = new Array(25);
+  map_layers: any[] = [];
+  vector_arr: any[] = [];
+  drawsource: any;
+
+  drawvector: any;
+  // search
+  selectedValue: any;
+  public listItems: Array<string> = [];
+  searchList: Array<string> = [];
+  currentLayerName: any;
+  layerData: any;
+  searchResult: { name: any, geom: any }[] = [];
+  loading: boolean;
+  searchResultNames: any[] = [];
+  layerName: any;
+  
+ 
+
+
+  container: any = document.getElementById('popup') as HTMLElement;
+  content: any = document.getElementById('popup-content') as HTMLElement;
+  closer: any = document.getElementById('popup-closer') as HTMLElement;
+  calculated_measurement: any = "";
+
+  overlay = new this.ol.Overlay({
+    element: this.container,
+    autoPan: {
+      animation: {
+        duration: 250,
+      },
+    },
+  });
+
+  gridarr: any[] = [];
+  gridInfoKeys: any;
+
+   // searchInput = new Subject<string>();
+   private searchInput = new Subject<any>()
+   subscription: Subscription = this.searchInput.pipe(debounceTime(1200), distinctUntilChanged(), tap(value => console.log("debounced value: " + value))).subscribe();
+   @ViewChild('autocomplete', { static: true }) autocomplete: AutoCompleteComponent;
+   selectedGeom: any;
+   selectedName: any;
+   selectedOption:any;
+ 
+   source = new this.ol.source.Vector();
+ 
+   vector = new this.ol.layer.Vector({
+     source: this.source,
+     style: new this.ol.style.Style({        
+       stroke: new this.ol.style.Stroke({
+         color: '#0e97fa',
+         width:4
+       })
+     })
+   });
+
+  private baseUrl1 = glob.environment.baseUrl;
+  constructor(private http: HttpClient, private commonService: CommonsService,  private toastr: ToastrService) {
+
+   }
+
+  ngOnInit(): void {
+
+    this.get_layer_panel_data("2D", "");
+
+    this.osm = new this.ol.layer.Tile({
+      source: new this.ol.source.OSM()
+    });
+
+    this.view = new this.ol.View({
+      projection: 'EPSG:3857',
+      center: this.ol.proj.fromLonLat([72.893189, 19.076986]),
+      zoom: 12,
+    });
+
+    this.map = new this.ol.Map({
+      layers: [this.osm],
+      target: 'map',
+      view: this.view
+    });
+
+    this.map.addLayer(this.vector);		
+
+    for (let z = 0; z < 25; ++z) {
+      this.resolutions[z] = this.size / Math.pow(2, z);
+      this.matrixIds[z] = z;
+    }
+    this.map.addOverlay(this.overlay);
+    //this.map.addLayer(this.drawvector);
+// search
+this.loadDropdown();
+this.searchInput.pipe(
+  debounceTime(300),
+  distinctUntilChanged(),
+  switchMap((searchTerm: string) => of(this.performSearch(searchTerm)))
+).subscribe();
+
+  }
+  ngOnDestroy() {
+    this.searchInput.complete();
+  }
+
+
+  toggleCollapse(parentLayerId: number) {
+    const collapseId = 'panelsStayOpen-collapse' + parentLayerId;
+    const collapseElement = document.getElementById(collapseId);
+    if (collapseElement) {
+      collapseElement.classList.toggle('show');
+    }
+  }
+
+  togglePanel() {
+    (this.state == "closed") ? this.state = "open" : this.state = "closed";
+  }
+
+
+  get_layer_panel_data(pageName, stateId) {
+    this.data = [];
+    var formData = {
+      flag: "fetch_all",
+      layer_type: "2D"
+    }
+
+
+    this.commonService.getLayerAndImagePanel(formData).subscribe((data: any) => {
+      this.data = data;
+      console.log(this.data);
+    });
+
+
+  }
+  url: any;
+  layer_name: any;
+  all_layer = new Array();
+
+  showHideData(event) {
+    this.url = event.target.getAttribute("service-url");
+    this.layer_name = event.target.getAttribute("layer_name");
+    this.layer_id = event.target.getAttribute("layer_id");
+
+    const flag_status =           event.target.getAttribute("dataid");
+    const service_url =           event.target.getAttribute("service-url");
+    const mobile_service_url =    event.target.getAttribute("mobile_service_url");
+    const is_combined_service =   event.target.getAttribute("combined_service");
+    const is_info_popup =         event.target.getAttribute("is_info_popup");
+    const is_attribute_info =     event.target.getAttribute("is_attribute_info");
+    const layer_name =            event.target.getAttribute("layer_name");
+    const defination =            event.target.getAttribute("defination");
+    const parent_layer =          event.target.getAttribute("parent_layer");
+    const table_name =            event.target.getAttribute("value");
+
+
+    if (event.target.checked == true) {
+
+
+      let curr_layer_source = new this.ol.source.TileWMS({
+        url: service_url,
+                    params: { 'LAYERS': "MIDC:" + table_name , 'TILED': true },
+                    serverType: 'geoserver',
+                    transition: 0, 
+        })
+      
+      this.curr_layer_source_arr.push(curr_layer_source);
+      
+      let current_layer:any = new this.ol.layer.Tile({
+        source: curr_layer_source
+      })
+
+            this.map.addLayer(current_layer);
+            this.map_layers[table_name] = current_layer;
+
+
+    }
+    else {
+
+      this.map.removeLayer(this.map_layers[table_name]);
+      if (this.all_layer.includes(this.layer_name)) {
+        delete this.all_layer[this.layer_id];
+      }
+    }
+  }
+
+
+  /** GOTO STARTS */
+
+
+  gotoFtn() {
+
+    if (this.GoToVectorLayer != null) {
+      this.map.removeLayer(this.GoToVectorLayer);
+    }
+
+
+    if(this.goto_click == true){
+      this.goto_click = false;
+    }
+    else{
+      this.goto_click = true;
+    }
+    
+    this.info_click = false;
+
+    this.clickHandler = (evt) => {
+
+
+
+      if (!this.goto_click) {
+        return;
+      }
+      else {
+        if (this.GoToVectorLayer != null) {
+          this.map.removeLayer(this.GoToVectorLayer);
+        }
+
+        console.info(evt.pixel);
+        console.info(this.map.getPixelFromCoordinate(evt.coordinate));
+        console.info(this.ol.proj.fromLonLat(evt.coordinate));
+
+        var know_your_coordinate = this.ol.proj.fromLonLat(evt.coordinate, 'EPSG:4326', 'EPSG:3857');
+
+        console.log(know_your_coordinate);
+        const iconFeature = new this.ol.Feature({
+          geometry: new this.ol.geom.Point(know_your_coordinate)
+        });
+
+        const vectorSource = new this.ol.source.Vector({
+          features: [iconFeature],
+        });
+
+        this.GoToVectorLayer = new this.ol.layer.Vector({
+          source: vectorSource,
+          //style: location_mark,
+        });
+        this.map.addLayer(this.GoToVectorLayer);
+
+
+        this.view.animate({
+          projection: 'EPSG: 4326',
+          center: [know_your_coordinate[0], know_your_coordinate[1]],
+          duration: 2000,
+          zoom: 20
+        });
+      }
+
+    }
+
+    this.map.on('click', this.clickHandler);
+
+  }
+
+  /** INFO STARTS */
+
+  featureInfo() {
+
+    this.info_click = true;
+    this.goto_click = false;
+
+    if (!this.info_click) {
+      return;
+    }
+    else {
+
+
+
+      this.clickHandler = (evt) => {
+
+        var clickedFeatures = [];
+        this.map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+          clickedFeatures.push(feature);
+        });
+
+        for (let k = 0; k < this.curr_layer_source_arr.length; k++) {
+          const viewResolution = /** @type {number} */ (this.view.getResolution());
+          const url = this.curr_layer_source_arr[k].getFeatureInfoUrl(evt.coordinate, viewResolution, 'EPSG:3857', { 'INFO_FORMAT': 'application/json' });
+          if (url) {
+
+            axios.get(url)
+              .then(response => {
+
+                if(response.data.features[0].properties != null || response.data.features[0].properties != ""){
+
+                  this.gridInfoKeys = Object.keys(response.data.features[0].properties);
+
+
+                    this.gridarr = response.data.features[0].properties;
+
+                }
+
+                var id = document.querySelectorAll('#tbl_info');
+                id.forEach(e => e.remove());
+
+                var content = '<table id="property_tbl" class="table table-striped ng-tns-c3968409143-0" style="display: block;"><tbody _ngcontent-ng-c3968409143="" class="ng-tns-c3968409143-0">';
+
+                for (var i = 0; i < this.gridInfoKeys.length; i++) {
+
+                  if (this.gridInfoKeys[i] != 'orientation') {
+                    
+                    this.gridInfoKeys[i].replace("/_/g" , " ");
+
+                    content += '<tr><th>' + this.gridInfoKeys[i] + '</th>' + '<td>' + this.gridarr[this.gridInfoKeys[i]] + '</td></tr>';
+                    
+                  }
+
+                }
+
+                this.addPropertyInfoPopup(content , evt.coordinate);
+
+                console.log(response);
+              })
+              .catch(error => {
+
+                console.error(error);
+              });
+          }
+        }
+
+      }
+    }
+
+    this.map.on('click', this.clickHandler);
+
+  }
+
+
+  /** INFO ENDS */
+
+
+  takeSS(){
+
+    var captureElement: any = document.querySelector("#map");
+
+    html2canvas(captureElement , {allowTaint: false, useCORS: true,}).then((canvas) => {
+   
+      const imageData = canvas.toDataURL("image/png");
+
+      const link = document.createElement("a");
+      link.setAttribute("download", "Map.png");
+      link.setAttribute("href", imageData);
+      link.click();
+    });
+  
+  }
+
+  /** GOTO ENDS */
+
+  addDrawInteraction(geometryType) {   
+
+    this.drawsource = new this.ol.source.Vector({ wrapX: false });
+
+    this.drawvector = new this.ol.layer.Vector({
+      source: this.drawsource,
+      style: new this.ol.style.Style({        
+        stroke: new this.ol.style.Stroke({
+          color: '#0e97fa',
+          width:4
+        })
+      })
+    });
+
+
+    this.Measuredraw = new this.ol.interaction.Draw({
+      source: this.drawsource,
+      //type: geometryType,
+      type: /** @type {ol.geom.GeometryType} */ (geometryType)
+    });
+    this.map.addInteraction(this.Measuredraw);
+    this.map.addLayer(this.drawvector);
+    
+    this.vector_arr.push(this.drawvector);
+    var measurementFormatted;
+    this.Measuredraw.on('drawstart', function (event) {
+      
+
+      event.feature.on('change', function (event) {
+        var measurement = geometryType === 'Polygon' ? event.target.getGeometry().getArea() : event.target.getGeometry().getLength();
+
+        measurementFormatted = measurement > 1000 ? (measurement / 1000).toFixed(2) + 'km' : measurement.toFixed(2) + 'm';
+
+        console.log(measurementFormatted);
+
+      });
+    });
+
+    this.Measuredraw.on('drawend', (event) => {
+      const geometry = event.feature.getGeometry();
+      const coordinate = geometry.getLastCoordinate();
+
+      if (measurementFormatted) {
+        this.addPopupOverlay(measurementFormatted, coordinate);
+      }
+
+    });
+  }
+
+  clearDrawnFeature(){
+
+    if (this.Measuredraw != null) {
+      this.map.removeInteraction(this.Measuredraw);
+      this.Measuredraw = null; 
+    }
+  
+    var id = document.querySelectorAll('#ol-popup');
+    id.forEach(e => e.remove());
+
+    var id = document.querySelectorAll('#tbl_info');
+    id.forEach(e => e.remove());
+   
+    console.log(this.vector_arr);
+
+    for (var i = 0; i < this.vector_arr.length; i++) {      
+      this.map.removeLayer(this.vector_arr[i]); 
+    }
+  
+
+    this.vector_arr = [];
+  
+    this.map.removeLayer(this.GoToVectorLayer);
+
+  }
+
+  addPopupOverlay(content: string, coordinate: any): void {
+    
+    const popupElement = document.createElement('div');
+    popupElement.id = 'ol-popup';
+    popupElement.innerHTML = content;
+
+    const popupOverlay = new this.ol.Overlay({
+      element: popupElement,
+      position: coordinate,
+      positioning: 'bottom-center',
+      stopEvent: true,
+    });
+
+    this.map.addOverlay(popupOverlay);
+
+    document.getElementById('ol-popup').setAttribute('style' , 'background-color: white;    border-radius: 10px;     border: 1px solid black;      padding: 5px 10px !important;')
+
+  }
+  
+  addLineStringMeasurement(): void {
+    if(this.Measuredraw != null){
+      this.map.removeInteraction(this.Measuredraw);
+    }
+    
+    this.addDrawInteraction('LineString');
+  }
+
+  addPolygonMeasurement(): void {
+   
+    if(this.Measuredraw != null){
+      this.map.removeInteraction(this.Measuredraw);
+    }
+    this.addDrawInteraction('Polygon');
+  }
+
+  addPropertyInfoPopup(content , coordinate){
+
+    const popupElement = document.createElement('div');
+    popupElement.id = 'tbl_info';
+    popupElement.innerHTML = content;
+
+    const popupOverlay = new this.ol.Overlay({
+      element: popupElement,
+      position: coordinate,
+      positioning: 'bottom-center',
+      stopEvent: true,
+    });
+
+    this.map.addOverlay(popupOverlay);
+
+
+    document.getElementById('tbl_info').setAttribute('style' , 'background-color: white;    border-radius: 10px;     border: 1px solid black;      padding: 5px 10px !important;');
+
+
+  }
+  // search
+  loadDropdown() {
+    this.commonService.getLayerData().subscribe(
+      (data: any) => {
+        console.log("load layers", data);
+        if (data.responseCode === 200) {
+          this.layerData = data.data;
+          this.listItems = this.layerData.map(element => element.layer_name);
+          console.log('Loaded layer names:', this.listItems);
+        } else {
+          console.error("Error fetching layers:", data.responseMessage);
+          this.toastr.error('Error fetching layers');
+        }
+      },
+      (error) => {
+        console.error("API Error:", error);
+        this.toastr.error('Something went wrong while fetching layers.');
+      }
+    );
+  }
+  
+  onSearchInputChange(eventValue: any) {
+    
+    this.searchInput.next(eventValue)
+
+    console.log("logging search value", eventValue);
+    console.log("selectedOption", this.selectedOption);
+
+    this.performSearch(eventValue);
+ 
+    
+  }
+  onValueChange(event: string) {
+    const selectedItem = this.searchResult.find(item => item.name === event);
+    if (selectedItem) {
+      this.selectedValue = selectedItem;
+      this.selectedName=this.selectedValue.name;
+      this.selectedGeom=this.selectedValue.geom;
+      alert(`Selected: ${selectedItem.name}`);
+    }
+  }
+  onSelectionChange() {
+    // alert(this.selectedOption);
+    // const selectedItem = this.searchResult.find(item => item.name === event);
+    // if (selectedItem) {
+    //   this.selectedValue = selectedItem;
+    // }
+  }
+
+  performSearch(searchTerm: string) {
+    const matchingLayers = this.layerData.filter(element => element.layer_name === this.selectedValue);
+    this.searchResult = [];
+    this.searchResultNames = [];
+    this.loading = true; 
+    const searchObservables = matchingLayers.map(element => {
+      const formData = {
+        keyword: searchTerm,
+        table_name: element.table_name
+      };
+      return this.commonService.searchChildlayer(JSON.stringify(formData));
+    });
+    // ForkJoin to wait for all observables to complete
+    forkJoin(searchObservables).subscribe(
+      (results: any[]) => {
+        results.forEach(data => {
+          if (data.responseCode === 200) {
+            const result = data.data;
+            console.log('search result',result)
+            result.forEach(row => {
+              this.searchResult.push({ name: row.name, geom: row.geom });
+              console.log('searchResult result',this.searchResult)
+              this.searchResultNames.push(row.name);
+
+              console.log('searchResultNames result', this.searchResultNames)
+            });
+          } else {
+            console.error("API Error:", data); // Log API error
+            this.toastr.error('name not found');
+          }
+        });
+        this.loading = false; // Reset loading state
+      },
+      error => {
+        console.error("API Error:", error);
+        this.toastr.error('Something went wrong while fetching data.');
+        this.loading = false; // Reset loading state
+      }
+    );
+  }
+
+
+}
+✔ search working good.
+✔getting name and geom on selecting name
+
+====================================
+CREATE OR REPLACE FUNCTION public.get_coords(input_geom geometry)
+    RETURNS text 
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    result_json text;
+	--select get_coords('01060000E0110F00000100000001030000C00100000009000000A7699C3BF2EE5E41E55C2BF429714041B67F369B937A3F40000000000000000016BAA991E3EE5E4110CE109C3E714041B67F369B937A3F400000000000000000F1A295E6E4EE5E414BCF886142714041B67F369B937A3F4000000000000000000CA69048E5EE5E416C55027743714041B67F369B937A3F400000000000000000AC718FA8E5EE5E41594F798F44714041B67F369B937A3F4000000000000000007BC9AFCBE6EE5E41DD0E0BE247714041B67F369B937A3F400000000000000000F410A375F5EE5E41352D233A33714041B67F369B937A3F400000000000000000B564CFDAF3EE5E41BAD3969D2E714041B67F369B937A3F400000000000000000A7699C3BF2EE5E41E55C2BF429714041B67F369B937A3F400000000000000000')
+BEGIN
+    SELECT 
+        json_build_object(
+            'responseCode', 200,
+            'data', COALESCE(to_json(array_agg(data1)), '[]'),
+            'responseMessage', 'ok'
+        )::text
+    INTO
+        result_json
+    FROM (
+        SELECT 
+            ST_X(ST_Transform(ST_Centroid((ST_Dump(input_geom)).geom), 4326))::numeric AS long,
+            ST_Y(ST_Transform(ST_Centroid((ST_Dump(input_geom)).geom), 4326))::numeric AS lat
+    ) AS data1;
+
+    RETURN result_json;
+END;
+$$;
+✔get coords
+
+@Override
+	public String registerNewUser(String json) {
+		String result = "";
+		try {
+			result = jdbcTemplate.queryForObject(SPUtility.FN_WEB_CRUD_USER_MANAGEMENT, new Object[] { json },
+					String.class);
+			if (result != null && !result.isEmpty()) {
+				return result;
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			LoggerUtil.setError(this.getClass(), "Error in UserDaoImpl ::  removeUserToken()");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@ApiOperation(value = "User Login API which validates the and authenticates valid users through web")
+	@RequestMapping(value = "/weblogin", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+	public ResponseEntity<?> loginWebUser(@RequestBody String json) throws JSONException {
+
+		String username = "";
+		String password = "";
+		try {
+			JSONObject obj = new JSONObject(json);
+
+			username = obj.getString("user_name").toString(); // pass json key as Username
+			password = obj.getString("password").toString();
+			System.out.println("username " + username + "  password " + password);
+
+			// validation for checking weather its empty or not
+			if ((username.equalsIgnoreCase(" ") || username.equalsIgnoreCase(""))
+					&& (password.equalsIgnoreCase(" ") || password.equalsIgnoreCase(""))) {
+				return ResponseEntity
+						.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_NULL_MOBORUNAME_PASS));
+
+			} else if (username.equalsIgnoreCase(" ") || username.equalsIgnoreCase("")) {
+
+				return ResponseEntity
+						.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_NULL_MOBILE_OR_UNAME));
+
+			} else if (password.equalsIgnoreCase(" ") || password.equalsIgnoreCase("")) {
+				return ResponseEntity.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_NULL_PASSWORD));
+
+			}
+
+			else {
+//				String decryptedPassword = CryptoHelper.decrypt(password);
+				System.out.println("Authentication..........");
+				Authentication authentication = authenticationManager
+						.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+
+				String jwt = jwtProvider.generateJwtToken(authentication);
+
+				// Get User all Details
+				UserProfileModel userProfileModel = getwebUserDetails(username);
+
+				userService.addWebUserToken(username, jwt);
+
+				UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+				// Send Response with token and user_name
+				JSONArray arr = new JSONArray();
+
+				JSONObject jwtResponse = new JSONObject(
+						new JwtResponse("Bearer " + jwt, userDetails.getAuthorities(), username));
+				jwtResponse.put("user_id", userProfileModel.getUser_id());
+				jwtResponse.put("name", userProfileModel.getName());
+				jwtResponse.put("user_name", userProfileModel.getUser_name());
+				jwtResponse.put("email_id", userProfileModel.getEmail_id());
+				jwtResponse.put("role_id", userProfileModel.getRole_id());
+				jwtResponse.put("role_name", userProfileModel.getRole_name());
+				jwtResponse.put("modules", userProfileModel.getModules());
+				arr.put(jwtResponse);
+
+				JSONObject responseObj = new JSONObject();
+				responseObj.put("responseCode", 200);
+				responseObj.put("data", arr);
+				responseObj.put("responseMessage", "Login Successful.");
+
+				return ResponseEntity.ok(responseObj.toString());
+			}
+
+		} catch (Exception e) {
+			System.out.println("ERROR while login ::: " + e);
+			return ResponseEntity
+					.ok(CustomMessages.getMessage(CustomMessages.RESPONSE_MESSAGE_FOR_USERNAME_OR_PASSWORD_INCORRECT));
+		}
+
+	}
+
+---------------------------------------------------------------------------------------------------------------------->>26/6/24
+<div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center">
+  <c-container>
+    <c-row class="justify-content-center">
+      <c-col lg="7" md="9" xl="6">
+        <c-card class="mx-4">
+          <c-card-body class="p-4">
+            <form cForm  [formGroup]="registerForm" (ngSubmit)="onSubmit()" >
+              <h1>Register</h1>
+              <p class="text-body-secondary">Create your account</p>
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cilUser"></svg>
+                </span>
+                <input  class="form-control" formControlName="username"  autoComplete="name" cFormControl placeholder="Username" />
+              </c-input-group>
+              <c-input-group class="mb-3">
+                <span cInputGroupText>&#64;</span>
+                <input  class="form-control" formControlName="email"  autoComplete="email" cFormControl placeholder="Email" />
+              </c-input-group>
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cilLockLocked"></svg>
+                </span>
+                <input  class="form-control" formControlName="password"  autoComplete="new-password" cFormControl placeholder="Password" type="password" />
+              </c-input-group>
+              <c-input-group class="mb-4">
+                <span cInputGroupText>
+                  <svg cIcon name="cilLockLocked"></svg>
+                </span>
+                <input  class="form-control" formControlName="role"  autoComplete="new-password" cFormControl placeholder="role"  />
+              </c-input-group>
+              <div class="d-grid">
+                <button cButton type="submit"color="success">Create Account</button>
+              </div>
+            </form>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </c-container>
+</div>
+import { Component, OnInit } from '@angular/core';
+import { IconDirective } from '@coreui/icons-angular';
+import { ContainerComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardBodyComponent, FormDirective, InputGroupComponent, InputGroupTextDirective, FormControlDirective, ButtonDirective } from '@coreui/angular';
+import { RouterModule, Router } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UserService } from 'src/services/user.service';
+// import {User }  from 'src/models/user'
+import { HttpClientModule,HttpClient } from '@angular/common/http';
+@Component({
+    selector: 'app-register',
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.scss'],
+    standalone: true,
+    imports: [HttpClientModule,ReactiveFormsModule,RouterModule,ContainerComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardBodyComponent, FormDirective, InputGroupComponent, InputGroupTextDirective, IconDirective, FormControlDirective, ButtonDirective],
+    providers:[HttpClient,UserService]
+})
+export class RegisterComponent implements OnInit{
+  registerForm: FormGroup;
+  constructor(private fb: FormBuilder,private service:UserService,private router: Router) {
+    this.registerForm = this.fb.group({
+      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      role: [[]]
+    });
+  }
+  ngOnInit(): void {
+   
+  }
+
+  onSubmit() {
+    if (this.registerForm.valid) {
+      console.log(this.registerForm.value);
+      // let user = new User(
+      //   this.registerForm.value['username'],
+      //   this.registerForm.value['email'],
+      //   this.registerForm.value['password'],
+      //   this.registerForm.value['role']
+      // );
+      let formdata = {
+        username: this.registerForm.get('username')?.value,
+        email: this.registerForm.get('email')?.value,
+        password: this.registerForm.get('password')?.value,
+        role: ['user']// Assuming 'user' role by default
+      };
+      this.service.signUp(formdata).subscribe((data: any) => {
+        alert(data.message);
+        this.router.navigate(['/login']);
+    
+      });
+    } else {
+      console.log('Form is invalid');
+    }
+  }
+
+}
+............................................................
+
+<div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center">
+  <c-container breakpoint="md">
+    <c-row class="justify-content-center">
+      <c-col lg="10" xl="8">
+        <c-card-group>
+          <c-card class="p-4">
+            <c-card-body>
+              <form cForm [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <h1>Login</h1>
+                <p class="text-body-secondary">Sign In to your account</p>
+                <c-input-group class="mb-3">
+                  <span cInputGroupText>
+                    <svg cIcon name="cilUser"></svg>
+                  </span>
+                  <input  class="form-control" formControlName="username" autoComplete="username" cFormControl placeholder="Username" />
+                </c-input-group>
+                <c-input-group class="mb-4">
+                  <span cInputGroupText>
+                    <svg cIcon name="cilLockLocked"></svg>
+                  </span>
+                  <input  class="form-control" formControlName="password"
+                    autoComplete="current-password"
+                    cFormControl
+                    placeholder="Password"
+                    type="password"
+                  />
+                </c-input-group>
+                <c-row>
+                  <c-col xs="6">
+                    <button type="submit" cButton class="px-4" color="primary">
+                      Login
+                    </button>
+                  </c-col>
+                  <c-col class="text-right" xs="6">
+                    <button cButton class="px-0" color="link">
+                      Forgot password?
+                    </button>
+                  </c-col>
+                </c-row>
+              </form>
+            </c-card-body>
+          </c-card>
+          <c-card [ngStyle]="{'minWidth.%': 44}" class="text-white bg-primary py-5">
+            <c-card-body class="text-center">
+              <div>
+                <h2>Sign up</h2>
+                <p>
+                  create new account
+                </p>
+                <button  [active]="true" cButton class="mt-3" color="primary" >
+                  Register Now!
+                </button>
+              </div>
+            </c-card-body>
+          </c-card>
+        </c-card-group>
+      </c-col>
+    </c-row>
+  </c-container>
+</div>
+import { Component } from '@angular/core';
+import { NgStyle } from '@angular/common';
+import { IconDirective } from '@coreui/icons-angular';
+import { ContainerComponent, RowComponent, ColComponent, CardGroupComponent, TextColorDirective, CardComponent, CardBodyComponent, FormDirective, InputGroupComponent, InputGroupTextDirective, FormControlDirective, ButtonDirective } from '@coreui/angular';
+import { RouterModule, Router } from '@angular/router';
+import { FormGroup, Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { UserService } from 'src/services/user.service';
+
+@Component({
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: true,
+    providers:[HttpClient,UserService],
+    imports: [HttpClientModule,ReactiveFormsModule,RouterModule,RouterModule,ContainerComponent, RowComponent, ColComponent, CardGroupComponent, TextColorDirective, CardComponent, CardBodyComponent, FormDirective, InputGroupComponent, InputGroupTextDirective, IconDirective, FormControlDirective, ButtonDirective, NgStyle]
+})
+export class LoginComponent {
+  loginForm: FormGroup;
+  constructor(private fb: FormBuilder,private service:UserService,private router: Router) {
+    this.loginForm = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+    });
+  }
+  ngOnInit(): void {
+   
+  }
+
+  onSubmit() {
+    if (this.loginForm.valid) {
+      console.log(this.loginForm.value);
+   
+      let formdata = {
+        username: this.loginForm.get('username')?.value,
+        password: this.loginForm.get('password')?.value,
+      };
+      this.service.signIn(formdata).subscribe((data: any) => {
+        
+        this.router.navigate(['/dashboard']);
+        localStorage.setItem('isLoggedIn', "true");
+        localStorage.setItem('id', data.id);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('roles', data.roles);
+        localStorage.setItem('tokenType', data.tokenType);
+        localStorage.setItem('accessToken', data.accessToken);
+      
+        // this.authorizationCheckService.modules = data.data[0].modules;
+        alert('Login Success');
+    
+      });
+    } else {
+      console.log('Form is invalid');
+    }
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
+import * as env from 'src/environments/environment'
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private  url =  env.environment.baseUrl;  
+  headers = new HttpHeaders().set('Content-Type','application/json');
+  constructor(private http:HttpClient,private router:Router) { }
+  signUp(jsonData :any)
+  {   
+      // http://localhost:8080/adminPanel/api/auth/signup
+    return this.http.post( 'http://localhost:8080/adminPanel/api/auth/signup', jsonData);  
+      
+  }
+  signIn(jsonData :any)
+  {   
+      // http://localhost:8080/adminPanel/api/auth/signin
+    return this.http.post(  'http://localhost:8080/adminPanel/api/auth/signin', jsonData);  
+      
+  }logout() {
+   
+    
+    localStorage.clear();
+
+    // Navigate to the login page or another appropriate page
+    this.router.navigate(['/login']);
+  }
+
+  
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Injectable } from '@angular/core';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthorizeService implements CanActivate {
+
+ 
+  constructor(private router: Router) { }
+  public modules = [];
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+      //If token data exist, user may login to application
+
+      // if (this.modules.length == 0) {
+      //     this.modules = localStorage.getItem('modules').split(',');
+      // }
+      
+      // let redirectedURL = state.url.replace('/', '');
+      // && this.modules.includes(redirectedURL)
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        return true;
+      } else {
+        alert('unauthorize');
+        localStorage.clear();
+        this.router.navigate(['/login']);
+        return false;
+      }
+    }}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Routes } from '@angular/router';
+import { DefaultLayoutComponent } from './layout';
+import { HttpClientModule,HttpClient } from '@angular/common/http';
+// import { authGuard } from '../auth/auth.guard';
+ import { AuthorizeService } from '../services/authorize.service';
+
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: '',
+    component: DefaultLayoutComponent,
+    canActivate: [AuthorizeService],
+    data: {
+      title: 'Home'
+    },
+    children: [
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes),
+        canActivate: [AuthorizeService],
+      },
+      {
+        path: 'user-management',
+        loadComponent: () => import('../components/user-management/user-management.component').then(m => m.UserManagementComponent),
+        canActivate: [AuthorizeService],
+        pathMatch: 'full'
+      },
+      {
+        path: 'theme',
+        loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
+      },
+      {
+        path: 'base',
+        loadChildren: () => import('./views/base/routes').then((m) => m.routes)
+      },
+      {
+        path: 'buttons',
+        loadChildren: () => import('./views/buttons/routes').then((m) => m.routes)
+      },
+      {
+        path: 'forms',
+        loadChildren: () => import('./views/forms/routes').then((m) => m.routes)
+      },
+      {
+        path: 'icons',
+        loadChildren: () => import('./views/icons/routes').then((m) => m.routes)
+      },
+      {
+        path: 'notifications',
+        loadChildren: () => import('./views/notifications/routes').then((m) => m.routes)
+      },
+      {
+        path: 'widgets',
+        loadChildren: () => import('./views/widgets/routes').then((m) => m.routes)
+      },
+      {
+        path: 'charts',
+        loadChildren: () => import('./views/charts/routes').then((m) => m.routes)
+      },
+      {
+        path: 'pages',
+        loadChildren: () => import('./views/pages/routes').then((m) => m.routes)
+      }
+    ]
+  },
+  {
+    path: '404',
+    loadComponent: () => import('./views/pages/page404/page404.component').then(m => m.Page404Component),
+    data: {
+      title: 'Page 404'
+    }
+  },
+  {
+    path: '500',
+    loadComponent: () => import('./views/pages/page500/page500.component').then(m => m.Page500Component),
+    data: {
+      title: 'Page 500'
+    }
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./views/pages/login/login.component').then(m => m.LoginComponent),
+    data: {
+      title: 'Login Page'
+    }
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./views/pages/register/register.component').then(m => m.RegisterComponent),
+    data: {
+      title: 'Register Page'
+    }
+  },
+  { path: '**', redirectTo: 'dashboard' }
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Routes } from '@angular/router';
+import { DefaultLayoutComponent } from './layout';
+import { HttpClientModule,HttpClient } from '@angular/common/http';
+// import { authGuard } from '../auth/auth.guard';
+ import { AuthorizeService } from '../services/authorize.service';
+
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: '',
+    component: DefaultLayoutComponent,
+    canActivate: [AuthorizeService],
+    data: {
+      title: 'Home'
+    },
+    children: [
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes),
+        canActivate: [AuthorizeService],
+      },
+      {
+        path: 'user-management',
+        loadComponent: () => import('../components/user-management/user-management.component').then(m => m.UserManagementComponent),
+        canActivate: [AuthorizeService],
+        pathMatch: 'full'
+      },
+      {
+        path: 'theme',
+        loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
+      },
+      {
+        path: 'base',
+        loadChildren: () => import('./views/base/routes').then((m) => m.routes)
+      },
+      {
+        path: 'buttons',
+        loadChildren: () => import('./views/buttons/routes').then((m) => m.routes)
+      },
+      {
+        path: 'forms',
+        loadChildren: () => import('./views/forms/routes').then((m) => m.routes)
+      },
+      {
+        path: 'icons',
+        loadChildren: () => import('./views/icons/routes').then((m) => m.routes)
+      },
+      {
+        path: 'notifications',
+        loadChildren: () => import('./views/notifications/routes').then((m) => m.routes)
+      },
+      {
+        path: 'widgets',
+        loadChildren: () => import('./views/widgets/routes').then((m) => m.routes)
+      },
+      {
+        path: 'charts',
+        loadChildren: () => import('./views/charts/routes').then((m) => m.routes)
+      },
+      {
+        path: 'pages',
+        loadChildren: () => import('./views/pages/routes').then((m) => m.routes)
+      }
+    ]
+  },
+  {
+    path: '404',
+    loadComponent: () => import('./views/pages/page404/page404.component').then(m => m.Page404Component),
+    data: {
+      title: 'Page 404'
+    }
+  },
+  {
+    path: '500',
+    loadComponent: () => import('./views/pages/page500/page500.component').then(m => m.Page500Component),
+    data: {
+      title: 'Page 500'
+    }
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./views/pages/login/login.component').then(m => m.LoginComponent),
+    data: {
+      title: 'Login Page'
+    }
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./views/pages/register/register.component').then(m => m.RegisterComponent),
+    data: {
+      title: 'Register Page'
+    }
+  },
+  { path: '**', redirectTo: 'dashboard' }
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// This file can be replaced during build by using the `fileReplacements` array.
+// `ng build` replaces `environment.ts` with `environment.prod.ts`.
+// The list of file replacements can be found in `angular.json`.
+
+
+import packageInfo from '../../package.json';
+
+export const environment = {
+  appVersion: packageInfo.version,
+  production: false,
+
+//   KENDO_UI_LICENSE: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkxJQyJ9.eyJwcm9kdWN0cyI6W3sidHJpYWwiOmZhbHNlLCJjb2RlIjoiS0VORE9VSVJFQUNUIiwibGljZW5zZUV4cGlyYXRpb25EYXRlIjoxNzM5ODYxMDkzfSx7InRyaWFsIjpmYWxzZSwiY29kZSI6IktFTkRPVUlDT01QTEVURSIsImxpY2Vuc2VFeHBpcmF0aW9uRGF0ZSI6MTczOTg2MTA5M30seyJ0cmlhbCI6ZmFsc2UsImNvZGUiOiJLRU5ET1VJVlVFIiwibGljZW5zZUV4cGlyYXRpb25EYXRlIjoxNzM5ODYxMDkzfSx7InRyaWFsIjpmYWxzZSwiY29kZSI6IktFTkRPVUlBTkdVTEFSIiwibGljZW5zZUV4cGlyYXRpb25EYXRlIjoxNzM5ODYxMDkzfV0sImludGVncml0eSI6Iko4cDBhblZXVzE5XC9UYnViN3pESnJvam1Zblk9IiwibGljZW5zZUhvbGRlciI6ImFydmluZEBhbW5leC5jb20iLCJpYXQiOjE3MDkxOTA2MjYsImF1ZCI6Im1hdWxpa0BhbW5leC5jb20iLCJ1c2VySWQiOiJkZTk4NWU5OS1kOTE4LTQ3YmMtODA3MC1hYTlmZmIyMTUwNGQifQ.QMFdhyXCmhsmSlX-i_DVbsrmIDbGMa5np6ioPgP53KwJHC8CKz7lzH0GBxxp_qS-Icws0vsPyUKX3tGiCE7_tWM41Q9xZRWJ-UZrlv2VBpS76tCTdEw_wVOY65ovcCCJPbiXEmac5arg0MQ5_RpIfMKOXhN3rvpYx0E-sbYXg3jHOuqq8es5DyXFbF293tsO3NlqKY8CVrns1kPaoWIaOwLtcl5ZIZg5da6WhOuSYmDHDTVdmxQV4Oj6kJCdFVhVba_xIdQbyqr3RtpLJkdECSLddcrRPPPr5Gd4fq1apaZHluoCd9BYc5ZjE0GVYXSfkUOtdXS_vuot-pleT9KBJg',
+
+  // Local Server
+  baseUrl:'http://localhost:8090/adminPanel/',
+  //baseUrl:'http://localhost:9090/midcgis/',
+
+  // Staging Server - digitaltwin
+  //baseUrl:'https://apagri.infinium.management/digitaltwin/',
+
+};
+/*
+ * For easier debugging in development mode, you can import the following file
+ * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+ *
+ * This import should be commented out in production mode because it will have a negative impact
+ * on performance if an error is thrown.
+ */
+// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------->>27/6/24
+-- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_insert_update_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+	_pole_id text;
+	_smart_asse text;
+	_pole_type text;
+	_arrangemen text;
+	_bracket_ty text;
+	_pole_heigh text;
+	_date_of_in text;
+	_cost text;
+	_pole_owner text;
+	_maintained text;
+	_last_paint text;
+	_number_of_ text;
+	_number_of1 text;
+	_ploe_light text;
+	_geom text;
+	
+	_street_arm_id integer;
+	_position text;
+	_status Boolean;
+	_width integer;
+	_status_ON_OFF text;
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		_gid                      := jsonObject ->> 'gid';
+		RAISE NOTICE 'value of a:%',_gid ;
+		
+		_street_arm_id            := jsonObject ->> 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		_street_light_arms_data   := jsonObject ->> 'data';
+		RAISE NOTICE 'value of a%',_street_light_arms_data ;
+		
+		_position                 := jsonObject ->> 'position';
+		RAISE NOTICE 'value of a%',_position ;
+		
+		_status                   := jsonObject ->> 'status';
+		RAISE NOTICE 'value of a%',_status ;
+		
+		_width                    := jsonObject ->> 'width';
+		RAISE NOTICE 'value of a%',_width ;
+		
+		_status_ON_OFF            := jsonObject ->> 'status_ON_OFF';
+		RAISE NOTICE 'value of a%',_status_ON_OFF ;
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN
+				RAISE NOTICE 'update' ;
+				UPDATE public.tbl_web_street_arms
+				SET street_arm_id=_street_arm_id, 
+				"position"=_position,
+				width=_width, 
+				status=_status, 
+				"status_ON_OFF"=_status_ON_OFF
+				 WHERE street_arm_id = _street_arm_id;
+				 		RAISE NOTICE 'update end' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Compained data updated successfully'',''status'',''success'')::text as data;';
+	        ELSE
+				RAISE NOTICE 'insert' ;
+				
+				
+				INSERT INTO public.tbl_web_street_arms(
+				street_arm_id, "position", width, status, "status_ON_OFF")
+				VALUES (_street_arm_id, _position,_width, _status, _status_ON_OFF);
+				
+				 		RAISE NOTICE 'insert end' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Compained data inserted successfully'',''status'',''success'')::text as data;';
+			END IF;	
+					sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''gid not present in parent table'',''status'',''success'')::text as data;';
+		 ELSE
+		 		
+		 END IF;
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_insert_update_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+........................................................................................................................................................................
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_insert_update_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+	_pole_id text;
+	_smart_asse text;
+	_pole_type text;
+	_arrangemen text;
+	_bracket_ty text;
+	_pole_heigh text;
+	_date_of_in text;
+	_cost text;
+	_pole_owner text;
+	_maintained text;
+	_last_paint text;
+	_number_of_ text;
+	_number_of1 text;
+	_ploe_light text;
+	_geom text;
+	
+	_street_arm_id integer;
+	_position text;
+	_status Boolean;
+	_width integer;
+	_status_ON_OFF text;
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		_gid                      := jsonObject ->> 'gid';
+		RAISE NOTICE 'value of a:%',_gid ;
+		
+		_street_arm_id            := jsonObject ->> 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		_street_light_arms_data   := jsonObject ->> 'data';
+		RAISE NOTICE 'value of a%',_street_light_arms_data ;
+		
+		_position                 := jsonObject ->> 'position';
+		RAISE NOTICE 'value of a%',_position ;
+		
+		_status                   := jsonObject ->> 'status';
+		RAISE NOTICE 'value of a%',_status ;
+		
+		_width                    := jsonObject ->> 'width';
+		RAISE NOTICE 'value of a%',_width ;
+		
+		_status_ON_OFF            := jsonObject ->> 'status_ON_OFF';
+		RAISE NOTICE 'value of a%',_status_ON_OFF ;
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN
+				RAISE NOTICE 'update' ;
+				UPDATE public.tbl_web_street_arms
+				SET street_arm_id=_street_arm_id, 
+				"position"=_position,
+				width=_width, 
+				status=_status, 
+				"status_ON_OFF"=_status_ON_OFF
+				 WHERE street_arm_id = _street_arm_id;
+				 		RAISE NOTICE 'update end' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Compained data updated successfully'',''status'',''success'')::text as data;';
+	        ELSE
+				RAISE NOTICE 'insert' ;
+				IF EXISTS(SELECT gid from shp_street_lights WHERE  = _street_arm_id)
+				then
+				
+					INSERT INTO public.tbl_web_street_arms(
+					street_arm_id, "position", width, status, "status_ON_OFF")
+					VALUES (_street_arm_id, _position,_width, _status, _status_ON_OFF);
+				ELSE 
+				
+					INSERT INTO public.shp_street_lights(gid)
+					VALUES (_street_arm_id);
+					
+					INSERT INTO public.tbl_web_street_arms(
+					street_arm_id, "position", width, status, "status_ON_OFF")
+					VALUES (_street_arm_id, _position,_width, _status, _status_ON_OFF);
+
+				END IF;
+				
+
+
+				
+				
+				 		RAISE NOTICE 'insert end' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''Compained data inserted successfully'',''status'',''success'')::text as data;';
+			END IF;	
+					sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''gid not present in parent table'',''status'',''success'')::text as data;';
+		 ELSE
+		 		
+		 END IF;
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_insert_update_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+
+
+
+
+
