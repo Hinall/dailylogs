@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<!-- saved from url=(0103)http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&sgid=1&sid=2&server_type=pg&did=1094573 -->
+<html class="no-js" lang="en"><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>digital_twin/postgres@staging</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- To set pgAdmin4 shortcut icon in browser -->
+    <link rel="shortcut icon" href="http://127.0.0.1:51504/favicon.ico?ver=43000">
+
+    <!-- Base template stylesheets -->
+    <link type="text/css" rel="stylesheet" href="./style.css">
+    <link type="text/css" rel="stylesheet" href="./pgadmin.style.css">
+    <link type="text/css" rel="stylesheet" href="./pgadmin.css">
+
+     <!--View specified stylesheets-->
+    <link type="text/css" rel="stylesheet" href="./browser.css">
+
+    <script>
+        /* This is used to change publicPath of webpack at runtime */
+        window.getChunkURL = function() {
+            return "/static/js/generated/";
+        };
+    </script>
+    <!-- Base template scripts -->
+    <script type="text/javascript" src="./require.min.js.download"></script>
+    <script type="text/javascript">
+            require.config({
+                baseUrl: '',
+                urlArgs: 'ver=43000',
+                waitSeconds: 0,
+                shim: {},
+                paths: {
+                    sources: "/static/js",
+                    datagrid: "/static/js/generated/datagrid",
+                    sqleditor: "/static/js/generated/sqleditor",
+                    'pgadmin.browser.utils': "/browser/" + "js/utils",
+                    'pgadmin.browser.endpoints': "/browser/" + "js/endpoints",
+                    'pgadmin.browser.messages': "/browser/" + "js/messages",
+                    'pgadmin.server.supported_servers': "/browser/" + "server/supported_servers",
+                    'pgadmin.user_management.current_user': "/user_management/" + "current_user",
+                    'translations': "/tools/" + "translations"
+                }
+            });
+
+    </script>
+
+    <!-- View specified scripts -->
+    <script type="text/javascript" src="./vendor.main.js.download"></script>
+    <script type="text/javascript" src="./vendor.others.js.download"></script>
+    <script type="text/javascript" src="./pgadmin_commons.js.download"></script>
+
+<script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sources/generated/browser_nodes" src="./browser_nodes.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sources/generated/codemirror" src="./codemirror.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sources/generated/slickgrid" src="./slickgrid.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sources/generated/sqleditor" src="./sqleditor.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="translations" src="./translations.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="pgadmin.browser.endpoints" src="./endpoints.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="pgadmin.browser.utils" src="./utils.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="pgadmin.user_management.current_user" src="./current_user.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="pgadmin.browser.messages" src="./messages.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="pgadmin.server.supported_servers" src="./supported_servers.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sources/gettext" src="./gettext.js.download"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sources/pgadmin" src="./pgadmin.js.download"></script><link id="wcTheme" rel="stylesheet" type="text/css" href="./webcabin(2).overrides.css"></head>
+<body tabindex="0" class="wcDesktop">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<style>
+    body {padding: 0px;}
+    </style>
+<link type="text/css" rel="stylesheet" href="./browser.css">
+<div id="main-editor_panel">
+    <div class="sql-editor">
+        <div id="btn-toolbar" class="editor-toolbar" role="toolbar" aria-label="">
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-show-query-tool" type="button" class="btn btn-sm btn-primary-icon btn-show-query-tool" title="Query tool (Alt+Shift+Q)" aria-label="Query tool (Alt+Shift+Q)" tabindex="0">
+                    <i class="pg-font-icon icon-query-tool" aria-hidden="true" role="img"></i>
+                </button>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-load-file" type="button" class="btn btn-sm btn-primary-icon btn-load-file" title="Open File (accesskey + O)" accesskey="O" tabindex="0" aria-label="Open File (accesskey + O)">
+                    <i class="fa fa-folder-open sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-save-file" type="button" class="btn btn-sm btn-primary-icon" title="Save File (accesskey + S)" accesskey="S" aria-label="Save File (accesskey + S)">
+                    <i class="fa fa-save sql-icon-lg" aria-hidden="true" tabindex="0" role="img"></i>
+                </button>
+                <button id="btn-file-menu-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-label="file menu">
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-file-menu-save" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0" style="display: block;">
+                            <span>Save</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-file-menu-save-as" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span>Save As</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-save-data" type="button" class="btn btn-sm btn-primary-icon" title="Save Data Changes (F6)" accesskey="" tabindex="0" disabled="" aria-label="Save Data Changes (F6)">
+                    <i class="pg-font-icon icon-save-data-changes sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-find" type="button" class="btn btn-sm btn-primary-icon" aria-label="Find" title="Find (Ctrl/Cmd+F)">
+                    <i class="fa fa-search sql-icon-lg" aria-hidden="true" tabindex="0" role="img"></i>
+                </button>
+                <button id="btn-find-menu-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Find (accesskey + N)" accesskey="N" tabindex="0" aria-label="Find (accesskey + N)">
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-find" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Find                                  (Ctrl+F)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-find-next" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Find Next                                  (Ctrl+G)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-find-previous" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Find Previous                                  (Ctrl+Shift+G)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-find-persistent" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span>Persistent Find</span>
+                        </a>
+                    </li>
+                    <li class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-replace" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Replace                                  (Ctrl+Shift+F)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-replace-all" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span>Replace All</span>
+                        </a>
+                    </li>
+                    <li class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" id="btn-find-menu-jump" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span>Jump (Alt+G)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-copy-row" type="button" class="btn btn-sm btn-primary-icon" title="Copy (accesskey + C)" accesskey="C" tabindex="0" disabled="" aria-label="Copy (accesskey + C)">
+                    <i class="fa fa-copy sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-copy-row-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-label="copy row">
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-copy-with-header" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="copy-with-header fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Copy with headers </span>
+                        </a>
+                    </li>
+                </ul>
+                <button id="btn-paste-row" type="button" class="btn btn-sm btn-primary-icon" title="Paste (accesskey + P)" accesskey="P" tabindex="0" disabled="" aria-label="Paste (accesskey + P)">
+                    <i class="fa fa-paste sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-delete-row" type="button" class="btn btn-sm btn-primary-icon" title="Delete (accesskey + D)" accesskey="D" tabindex="0" disabled="" aria-label="Delete (accesskey + D)">
+                    <i class="fa fa-trash-alt sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-edit-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Edit" title="Edit" tabindex="0">
+                    <i class="fa fa-edit sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-indent-code" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Indent Selection (Tab) </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-unindent-code" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Unindent Selection (Shift+Tab) </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-comment-line" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Inline Comment Selection                                  (Ctrl+/)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-uncomment-line" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Inline Uncomment Selection                                  (Ctrl+.)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-toggle-comment-block" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Block Comment/Uncomment Selection                                  (Shift+Ctrl+/)</span>
+                        </a>
+                    </li>
+                    <li class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" id="btn-format-sql" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span>Format SQL                                  (Shift+Ctrl+K)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-filter" type="button" class="btn btn-secondary" title="Filter (accesskey + F)" accesskey="F" tabindex="0" disabled="" aria-label="Filter (accesskey + F)">
+                    <i class="fa fa-filter sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-filter-dropdown" type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Filter options (accesskey + I)" accesskey="I" disabled="" tabindex="0" aria-label="Filter options (accesskey + I)">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a id="btn-filter-menu" class="dropdown-item" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">Sort/Filter</a>
+                    </li>
+                    <li>
+                        <a id="btn-include-filter" class="dropdown-item" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">Filter by Selection</a>
+                    </li>
+                    <li>
+                        <a id="btn-exclude-filter" class="dropdown-item" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">Exclude by Selection</a>
+                    </li>
+                    <li>
+                        <a id="btn-remove-filter" class="dropdown-item" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">Remove Sort/Filter</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <select id="btn-rows-limit" class="limit form-control form-control-sm" disabled="" title="Rows limit (accesskey + R)" accesskey="R" tabindex="0" aria-label="Rows limit (accesskey + R)">
+                    <option value="-1">No limit</option>
+                    <option value="1000">1000 rows</option>
+                    <option value="500">500 rows</option>
+                    <option value="100">100 rows</option>
+                </select>
+            </div>
+
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-cancel-query" type="button" class="btn btn-sm btn-primary-icon" title="Cancel query (accesskey + Q)" accesskey="Q" tabindex="0" aria-label="Cancel query (accesskey + Q)" disabled="">
+                    <i class="fa fa-stop sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-flash" data-test-selector="execute-refresh-button" type="button" class="btn btn-sm btn-primary-icon" style="width: 32px;" title="Execute/Refresh (F5)" tabindex="0" data-click-counter="4" aria-label="Execute/Refresh (F5)">
+                    <i class="fa fa-play sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-query-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" accesskey="X" title="Execute options (accesskey + X)" tabindex="0" aria-label="Execute options (accesskey + X)">
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-auto-commit" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="auto-commit fa fa-check" aria-hidden="true" role="img"></i>
+                            <span> Auto commit? </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-auto-rollback" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="auto-rollback fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Auto rollback? </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-explain" type="button" class="btn btn-sm btn-primary-icon" title="Explain (F7)" accesskey="" tabindex="0" aria-label="Explain (F7)">
+                    <i class="fa fa-hand-pointer sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-explain-analyze" type="button" class="btn btn-sm btn-primary-icon" title="Explain Analyze (Shift+F7)" accesskey="" aria-label="Explain Analyze (Shift+F7)">
+                    <i class="fa fa-list-alt sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-explain-options-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-label="explain">
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-explain-verbose" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="explain-verbose fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Verbose </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-explain-costs" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="explain-costs fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Costs </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-explain-buffers" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="explain-buffers fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Buffers </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-explain-timing" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="explain-timing fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Timing </span>
+                        </a>
+                    </li>
+                    <li data-min-ver="100000" class="d-none">
+                        <a class="dropdown-item" id="btn-explain-summary" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="explain-summary fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Summary </span>
+                        </a>
+                    </li>
+                    <li data-min-ver="120000" class="d-none">
+                        <a class="dropdown-item" id="btn-explain-settings" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <i class="explain-settings fa fa-check visibility-hidden" aria-hidden="true" role="img"></i>
+                            <span> Settings </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-commit" type="button" class="btn btn-sm btn-primary-icon" title="Commit (Shift+Ctrl+M)" accesskey="" tabindex="0" disabled="" aria-label="Commit (Shift+Ctrl+M)">
+                    <i class="pg-font-icon icon-commit sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <button id="btn-rollback" type="button" class="btn btn-sm btn-primary-icon" title="Rollback (Shift+Ctrl+R)" tabindex="0" disabled="" aria-label="Rollback (Shift+Ctrl+R)">
+                    <i class="pg-font-icon icon-rollback sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+            </div>
+            <div class="btn-group mr-1" role="group" aria-label="">
+                <button id="btn-clear-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Clear (accesskey + L)" accesskey="L" tabindex="0" aria-label="Clear (accesskey + L)">
+                    <i class="fa fa-eraser sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-clear" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Clear Query Window </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="btn-clear-history" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Clear History </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group" role="group" aria-label="">
+                <button id="btn-save-results-to-file" type="button" class="btn btn-sm btn-primary-icon" title="Save results to file (F8)" tabindex="0" aria-label="Save results to file (F8)" disabled="">
+                    <i class="fa fa-download sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+            </div>
+            <div class="btn-group mr-1 user_macros" role="group" aria-label="">
+                <button id="btn-macro-dropdown" type="button" class="btn btn-sm btn-primary-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Macros" title="Macros" tabindex="0">
+                    <i class="fa fa-scroll sql-icon-lg" aria-hidden="true" role="img"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" id="btn-manage-macros" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">
+                            <span> Manage Macros... </span>
+                        </a>
+                    </li>
+                                                        </ul>
+            </div>
+        </div>
+
+        <div class="connection_status_wrapper d-flex">
+            <div id="btn-conn-status" role="status" class="connection_status d-flex justify-content-center align-items-center" data-container="body" data-toggle="popover" data-placement="bottom" data-content="The session is idle and there is no current transaction." data-panel-visible="visible" accesskey="T" tabindex="0" data-original-title="" title="">
+                <i class="pg-font-icon icon-query-tool-connected" aria-hidden="true" title="Connection status (click for details) (accesskey + T)" role="img">
+                </i>
+            </div>
+            <div class="connection-info btn-group mr-1" role="group" aria-label="" style="background-color: ; color: ;">
+                <div class="connection-data" data-toggle="dropdown">
+                    <div class="editor-title" aria-haspopup="true" aria-expanded="false" style="background-color: ; color: ;">digital_twin/postgres@staging</div>
+                    <span class="conn-info-dd dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"></span>
+                </div>
+                <ul class="dropdown-menu" id="connections-list"><li class="connection-list-item selected-connection" data-index="0"><a class="dropdown-item" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">digital_twin/postgres@staging</a></li><li class="connection-list-item" data-index="1"><a class="dropdown-item" href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="0">&lt;New Connection&gt;</a></li></ul>
+            </div>
+
+
+        </div>
+        <div id="editor-panel" tabindex="0">
+            <div id="fetching_data" class="pg-sp-container sql-editor-busy-fetching d-none">
+                <div class="pg-sp-content">
+                    <div class="row">
+                        <div class="col-12 pg-sp-icon sql-editor-busy-icon"></div>
+                    </div>
+                    <div class="row"><div class="col-12 pg-sp-text sql-editor-busy-text">Loading data from the database server and rendering...</div></div>
+                </div>
+            </div>
+        <div class="wcDocker"><div class="wcDockerTransition"></div><div class="wcLayoutPane" style="height: 0px; top: 0px; left: 0px; right: 0px;"><div class="wcLayoutPane" style="width: 0px; left: 0px; top: 0px; bottom: 0px;"><div class="wcFrame wcWide wcTall"><div class="wcFrameTitleBar wcTabTop" style="width: 0px;"><div class="wcTabScroller" style="left: 0px;"><div class="wcPanelTab wcPanelTabActive" id="0"><div><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Query Editor</a></div></div><div class="wcPanelTab" id="1"><div><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Query History</a></div></div></div><div class="wcFrameButtonBar" style="min-width: 0px; width: 0px; right: 0px;"></div></div><div class="wcFrameButtonBar" style="min-width: 0px; width: 0px;"><div class="wcFrameButton" title="Close the currently active panel tab" aria-label="Close panel" tabindex="0" style="display: none;"><div class="fa fa-times"></div></div><div class="wcFrameButton" title="Collapse the active panel" style="display: none;"><div class="fa fa-download"></div>C</div></div><div class="wcFrameCenter wcPanelBackground wcScrollableX wcScrollableY" style="left: 0px; right: 0px; bottom: 0px;"><div class="wcPanelTabContent" id="0"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content"><label for="sql_query_tool" class="sr-only">SQL Editor<textarea id="sql_query_tool" tabindex="-1"></textarea></label><div id="output-panel" tabindex="0"><textarea id="sql_query_tool" tabindex="-1" style="display: none;"></textarea><div class="CodeMirror cm-s-default CodeMirror-simplescroll dialog-opened" style="font-size: 1em;"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 583.73px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="SQL editor" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-simplescroll-horizontal" cm-not-content="true" style="display: block; right: 15px; left: 0px;"><div style="width: 10px; left: 0px;"></div></div><div class="CodeMirror-simplescroll-vertical" cm-not-content="true" style="display: block; bottom: 15px;"><div style="height: 10px; top: -25px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true" style="height: 15px; width: 15px; display: block;"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1" draggable="false"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: -15px; border-right-width: 35px; min-height: 1457px; min-width: 3px; padding-right: 15px; padding-bottom: 15px;"><div style="position: relative; top: 294px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"><pre class="CodeMirror-line" role="presentation"><span role="presentation" style="padding-right: 0.1px;">        sql_query <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-string">'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''Failed'')::text as data'</span><span class="cm-punctuation">;</span>                                                                                    </span></pre></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code" role="presentation" style=""><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">15</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    _street_arm_id <span class="cm-builtin">integer</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">16</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    _street_light_arms_data <span class="cm-builtin">text</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">17</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    jsonObject <span class="cm-builtin">JSON</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">18</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    sql_query <span class="cm-builtin">text</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">19</div><div class="CodeMirror-gutter-elt" style="left: 29px; width: 13px;"><div class="CodeMirror-foldgutter-open CodeMirror-guttermarker-subtle"></div></div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">BEGIN</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">20</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">RAISE</span> <span class="cm-keyword">NOTICE</span> <span class="cm-string">'Initial notice'</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">21</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">22</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    jsonObject <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-keyword">cast</span><span class="cm-bracket">(</span>jsonArray <span class="cm-keyword">AS</span> <span class="cm-builtin">JSON</span><span class="cm-bracket">)</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">23</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">RAISE</span> <span class="cm-keyword">NOTICE</span> <span class="cm-string">'Parsed JSON Object: %'</span><span class="cm-punctuation">,</span> jsonObject<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">24</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">25</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    _street_arm_id <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-bracket">(</span>jsonObject <span class="cm-operator">-&gt;&gt;</span> <span class="cm-string">'street_arm_id'</span><span class="cm-bracket">)</span><span class="cm-punctuation">::</span><span class="cm-builtin">integer</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">26</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">RAISE</span> <span class="cm-keyword">NOTICE</span> <span class="cm-string">'Street Arm ID: %'</span><span class="cm-punctuation">,</span> _street_arm_id<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">27</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">28</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">IF</span> <span class="cm-keyword">EXISTS</span> <span class="cm-bracket">(</span><span class="cm-keyword">SELECT</span> <span class="cm-operator">*</span> <span class="cm-keyword">FROM</span> shp_street_lights <span class="cm-keyword">WHERE</span> gid <span class="cm-operator">=</span> _street_arm_id<span class="cm-bracket">)</span> <span class="cm-keyword">THEN</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">29</div><div class="CodeMirror-gutter-elt" style="left: 29px; width: 13px;"><div class="CodeMirror-foldgutter-open CodeMirror-guttermarker-subtle"></div></div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-keyword">IF</span> <span class="cm-keyword">EXISTS</span> <span class="cm-bracket">(</span><span class="cm-keyword">SELECT</span> street_arm_id <span class="cm-keyword">FROM</span> tbl_web_street_arms <span class="cm-keyword">WHERE</span> street_arm_id <span class="cm-operator">=</span> _street_arm_id<span class="cm-bracket">)</span> <span class="cm-keyword">THEN</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">30</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            <span class="cm-keyword">DELETE</span> <span class="cm-keyword">FROM</span> tbl_web_street_arms</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">31</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            <span class="cm-keyword">WHERE</span> street_arm_id <span class="cm-operator">=</span> _street_arm_id<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">32</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            </span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">33</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            <span class="cm-keyword">RAISE</span> <span class="cm-keyword">NOTICE</span> <span class="cm-string">'Deleted successfully'</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">34</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">35</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            sql_query <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-string">'SELECT json_build_object(''responseCode'', 200, ''responseMessage'', ''Data deleted successfully'', ''status'', ''success'')::text as data;'</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">36</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-keyword">ELSE</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">37</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            sql_query <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-string">'SELECT json_build_object(''responseCode'', 200, ''responseMessage'', ''Data does not exist'', ''status'', ''success'')::text as data;'</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">38</div><div class="CodeMirror-gutter-elt" style="left: 29px; width: 13px;"><div class="CodeMirror-foldgutter-open CodeMirror-guttermarker-subtle"></div></div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-keyword">END</span> <span class="cm-keyword">IF</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">39</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">ELSE</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">40</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        sql_query <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-string">'SELECT json_build_object(''responseCode'', 200, ''responseMessage'', ''Street light does not exist'', ''status'', ''success'')::text as data;'</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">41</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">END</span> <span class="cm-keyword">IF</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">42</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">43</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">RETURN</span> <span class="cm-keyword">QUERY</span> <span class="cm-keyword">EXECUTE</span> sql_query<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">44</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">45</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">EXCEPTION</span> <span class="cm-keyword">WHEN</span> <span class="cm-keyword">OTHERS</span> <span class="cm-keyword">THEN</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">46</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">DECLARE</span> </span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">47</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        p_errormessage <span class="cm-builtin">VARCHAR</span><span class="cm-bracket">(</span><span class="cm-number">4000</span><span class="cm-bracket">)</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">48</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        p_errorstate <span class="cm-builtin">VARCHAR</span><span class="cm-bracket">(</span><span class="cm-number">4000</span><span class="cm-bracket">)</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">49</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        p_errorline <span class="cm-builtin">VARCHAR</span><span class="cm-bracket">(</span><span class="cm-number">4000</span><span class="cm-bracket">)</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">50</div><div class="CodeMirror-gutter-elt" style="left: 29px; width: 13px;"><div class="CodeMirror-foldgutter-open CodeMirror-guttermarker-subtle"></div></div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">BEGIN</span>                                    </span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">51</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        p_errormessage <span class="cm-punctuation">:</span><span class="cm-operator">=</span> SQLERRM<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">52</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        p_errorstate <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-keyword">SQLSTATE</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">53</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-keyword">GET</span> <span class="cm-keyword">STACKED</span> <span class="cm-keyword">DIAGNOSTICS</span> p_errorline <span class="cm-operator">=</span> <span class="cm-keyword">PG_EXCEPTION_CONTEXT</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">54</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">55</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-keyword">INSERT</span> <span class="cm-keyword">INTO</span> tbl_error_log <span class="cm-bracket">(</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">56</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            error_name<span class="cm-punctuation">,</span> error_callstack<span class="cm-punctuation">,</span> error_method<span class="cm-punctuation">,</span> created_on</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">57</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-bracket">)</span> <span class="cm-keyword">VALUES</span> <span class="cm-bracket">(</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">58</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">            p_errorline<span class="cm-punctuation">,</span> p_errormessage <span class="cm-operator">||</span> <span class="cm-string">' fn_web_delete_streetlight_arms'</span><span class="cm-punctuation">,</span> p_errorstate<span class="cm-punctuation">,</span> timezone<span class="cm-bracket">(</span><span class="cm-string">'Asia/Kolkata'</span><span class="cm-punctuation">,</span> now<span class="cm-bracket">())</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">59</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-bracket">)</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">60</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">61</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        sql_query <span class="cm-punctuation">:</span><span class="cm-operator">=</span> <span class="cm-string">'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''Failed'')::text as data'</span><span class="cm-punctuation">;</span>                                                                                    </span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">62</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">        <span class="cm-keyword">RETURN</span> <span class="cm-keyword">QUERY</span> <span class="cm-keyword">EXECUTE</span> sql_query<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">63</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">END</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">64</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">END</span><span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">65</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">$BODY$<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">66</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">67</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">ALTER</span> <span class="cm-keyword">FUNCTION</span> <span class="cm-keyword">public</span><span class="cm-variable-2">.fn_web_delete_streetlight_arms</span><span class="cm-bracket">(</span><span class="cm-builtin">text</span><span class="cm-bracket">)</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">68</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">    <span class="cm-keyword">OWNER</span> <span class="cm-keyword">TO</span> postgres<span class="cm-punctuation">;</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" style="left: -41.9922px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">69</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div></div></div></div></div></div><div style="position: absolute; height: 35px; width: 1px; border-bottom: 15px solid transparent; top: 1457px;"></div><div class="CodeMirror-gutters" style="height: 1507px; left: 0px;"><div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 29px;"></div><div class="CodeMirror-gutter CodeMirror-foldgutter"></div></div></div><div class="CodeMirror-dialog CodeMirror-dialog-top"><span class="CodeMirror-search-label">Search:</span> <input type="text" style="width: 10em" class="CodeMirror-search-field"> <span style="color: #888" class="CodeMirror-search-hint">(Use /re/ syntax for regexp search)</span></div></div></div></div></td></tr></tbody></table></div><div class="wcPanelTabContent wcPanelTabContentHidden" id="1"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content"><div id="history_grid" class="sql-editor-history-container d-flex" tabindex="0"><div style="width: calc(50% - 0.5px);"><div class="toggle-and-history-container">
+            <div class="query-history-toggle">
+                <label class="control-label" for="generated-queries-toggle">
+                    Show queries generated internally by pgAdmin?
+                </label>
+                <div class="toggle btn btn-success btn-xs quick" data-toggle="toggle" style="width: 0px; height: 0px;"><input id="generated-queries-toggle" type="checkbox" class="pgadmin-controls" data-style="quick" data-size="mini" data-on="Yes" data-off="No" data-onstyle="success" data-offstyle="ternary" checked=""><div class="toggle-group"><label class="btn btn-success btn-xs toggle-on">Yes</label><label class="btn btn-ternary btn-xs toggle-off">No</label><span class="toggle-handle btn btn-light btn-xs"></span></div></div>
+            </div>
+            <div id="query_list" class="query-history" tabindex="0"><div class="query-group" data-key="2024 06 27">
+            <div class="date-label">Today - 6/27/2024</div>
+            <ul class="query-entries"><li class="list-item selected" tabindex="0" data-key="12:36:22">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_delete_streetlight_arms(text)
+
+-- DROP FUNCTION public.fn_web_delete_streetlight_arms(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+    jsonArray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+AS $BODY$
+DECLARE
+    _gid integer;
+    _street_arm_id integer;
+    _street_light_arms_data text;
+    jsonObject JSON;
+    sql_query text;
+BEGIN
+    RAISE NOTICE 'Initial notice';
+
+    jsonObject := cast(jsonArray AS JSON);
+    RAISE NOTICE 'Parsed JSON Object: %', jsonObject;
+
+    _street_arm_id := (jsonObject -&gt;&gt; 'street_arm_id')::integer;
+    RAISE NOTICE 'Street Arm ID: %', _street_arm_id;
+
+    IF EXISTS (SELECT * FROM shp_street_lights WHERE gid = _street_arm_id) THEN
+        IF EXISTS (SELECT street_arm_id FROM tbl_web_street_arms WHERE street_arm_id = _street_arm_id) THEN
+            DELETE FROM tbl_web_street_arms
+            WHERE street_arm_id = _street_arm_id;
+            
+            RAISE NOTICE 'Deleted successfully';
+
+            sql_query := 'SELECT json_build_object(''responseCode'', 200, ''responseMessage'', ''Data deleted successfully'', ''status'', ''success'')::text as data;';
+        ELSE
+            sql_query := 'SELECT json_build_object(''responseCode'', 200, ''responseMessage'', ''Data does not exist'', ''status'', ''success'')::text as data;';
+        END IF;
+    ELSE
+        sql_query := 'SELECT json_build_object(''responseCode'', 200, ''responseMessage'', ''Street light does not exist'', ''status'', ''success'')::text as data;';
+    END IF;
+
+    RETURN QUERY EXECUTE sql_query;
+
+EXCEPTION WHEN OTHERS THEN
+    DECLARE 
+        p_errormessage VARCHAR(4000);
+        p_errorstate VARCHAR(4000);
+        p_errorline VARCHAR(4000);
+    BEGIN                                    
+        p_errormessage := SQLERRM;
+        p_errorstate := SQLSTATE;
+        GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+        INSERT INTO tbl_error_log (
+            error_name, error_callstack, error_method, created_on
+        ) VALUES (
+            p_errorline, p_errormessage || ' fn_web_delete_streetlight_arms', p_errorstate, timezone('Asia/Kolkata', now())
+        );
+
+        sql_query := 'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''Failed'')::text as data';                                                                                    
+        RETURN QUERY EXECUTE sql_query;
+    END;
+END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_delete_streetlight_arms(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:36:22</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:35:19">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+
+	
+	_street_arm_id integer;
+	
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		
+		
+		_street_arm_id            := jsonObject -&gt;&gt; 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN 
+			delete from tbl_web_street_arms
+			where street_arm_id=_street_arm_id;
+			
+				 		RAISE NOTICE 'delete' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	        ELSE
+			
+				
+				 	
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			END IF;	
+			END IF;
+					
+		
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_delete_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:35:19</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:34:55">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  "position":"left","status":"false","width":"4","status_ON_OFF":"ON"
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:34:55</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:34:49">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  			
+			
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:34:49</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:34:34">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  	
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:34:34</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:33:20">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_gid integer;
+	_street_arm_id integer;
+	_street_light_arms_data text;
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_delete_streetlight_arms('{"street_arm_id":11}');
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		_street_arm_id := jsonObject -&gt;&gt; 'street_arm_id';
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+					THEN 
+					delete from tbl_web_street_arms
+					where street_arm_id=_street_arm_id;
+
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	          ELSE
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			   END IF;	
+		END IF;
+	
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_delete_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:33:20</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:33:13">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_gid integer;
+	_street_arm_id integer;
+	_street_light_arms_data text;
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_delete_streetlight_arms('{"street_arm_id":11}');
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		_street_arm_id := jsonObject -&gt;&gt; 'street_arm_id';
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+					THEN 
+					delete from tbl_web_street_arms
+					where street_arm_id=_street_arm_id;
+
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	          ELSE
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			   END IF;	
+		END IF;
+	
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_delete_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:33:13</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:30:45">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  SELECT * FROM fn_web_delete_streetlight_arms('{"street_arm_id":11}');
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:30:45</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:30:11">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+
+	
+	_street_arm_id integer;
+	
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		
+		
+		_street_arm_id            := jsonObject -&gt;&gt; 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN 
+			delete from tbl_web_street_arms
+			where street_arm_id=_street_arm_id;
+			
+				 		RAISE NOTICE 'delete' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	        ELSE
+			
+				
+				 	
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			END IF;	
+			END IF;
+					
+		
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_delete_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:30:11</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:29:30">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+
+	
+	_street_arm_id integer;
+	
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		
+		
+		_street_arm_id            := jsonObject -&gt;&gt; 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN 
+			delete from tbl_web_street_arms
+			where street_arm_id=_street_arm_id;
+			
+				 		RAISE NOTICE 'delete' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	        ELSE
+			
+				
+				 	
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			END IF;	
+					
+		
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_delete_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:29:30</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:28:41">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+
+	
+	_street_arm_id integer;
+	
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		
+		
+		_street_arm_id            := jsonObject -&gt;&gt; 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN 
+			delete from tbl_web_street_arms
+			where street_arm_id=_street_arm_id;
+			
+				 		RAISE NOTICE 'delete' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	        ELSE
+			
+				
+				 	
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			END IF;	
+					
+		
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_insert_update_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:28:41</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="12:28:32">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_insert_re_instegration_data(text)
+
+-- DROP FUNCTION public.fn_web_insert_re_instegration_data(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_delete_streetlight_arms(
+	jsonarray text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+
+	
+	_gid integer;
+
+	
+	_street_arm_id integer;
+	
+	_street_light_arms_data text;
+
+	
+	jsonObject JSON;
+	json JSON;
+	sql_query text;
+	
+		
+			
+	BEGIN
+	RAISE NOTICE 'value of a ' ; 
+-- 		select * from public.tbl_web_street_arms limit 10;
+-- 		select * from public.shp_street_lights limit 10;
+-- select fn_web_insert_streetlight_arms('{"gid":1,"position":"left","status":false,"width":"4","status_ON_OFF":"ON"}');
+-- SELECT * FROM fn_web_insert_streetlight_arms('{"street_arm_id":12,"position":"left","status":"false","width":"4","status_ON_OFF":"ON"}');
+-- 
+-- 				 INSERT INTO public.shp_street_lights( gid)
+-- 				 VALUES (_gid);
+-- select * from tbl_error_log order by created_on desc limit 10
+		jsonObject := cast(jsonArray AS JSON) :: JSON;
+		RAISE NOTICE 'value of a%',jsonObject ;
+		
+		
+		
+		_street_arm_id            := jsonObject -&gt;&gt; 'street_arm_id';
+		RAISE NOTICE 'value of a%',_street_arm_id ;
+		
+		
+         IF EXISTs(select * from shp_street_lights where gid=_street_arm_id)
+		 then
+		 		IF EXISTS (SELECT street_arm_id from tbl_web_street_arms WHERE street_arm_id = _street_arm_id) 
+			THEN 
+			delete from tbl_web_street_arms
+			where street_arm_id=_street_arm_id
+			
+				 		RAISE NOTICE 'delete' ;
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data deleted successfully'',''status'',''success'')::text as data;';
+	        ELSE
+			
+				
+				 	
+				 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'',''data does not exist'',''status'',''success'')::text as data;';
+			END IF;	
+					
+		
+			
+		RETURN QUERY EXECUTE sql_query;
+			EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log
+				(
+					error_name,error_callstack,error_method,created_on
+				)		
+				SELECT p_errorline,p_errormessage||'fn_web_insert_update_streetlight_arms',p_errorstate,timezone('Asia/Kolkata'::text, now());
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';																					 
+				RETURN QUERY EXECUTE sql_query;
+			END;
+			
+
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_insert_re_instegration_data(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">12:28:32</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="11:26:00">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  INSERT INTO public.tbl_web_street_arms(
+	street_arm_id, "position", width, status, "status_ON_OFF")
+	VALUES (1, 'left', 4, true, 'ON');
+              </div>
+              <div class="other-info">
+              <div class="timestamp">11:26:00</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="11:25:44">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  INSERT INTO public.tbl_web_street_arms(
+	street_arm_id, "position", width, status, "status_ON_OFF")
+	VALUES (1, left, 4, true, 'ON');
+              </div>
+              <div class="other-info">
+              <div class="timestamp">11:25:44</div>
+              </div>
+          </div>
+      </li></ul>
+        </div><div class="query-group" data-key="2024 06 26">
+            <div class="date-label">Today - 6/26/2024</div>
+            <ul class="query-entries"><li class="list-item" tabindex="0" data-key="18:54:54">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  ALTER TABLE public.tbl_web_street_arms
+ADD CONSTRAINT fk_street_light_id
+FOREIGN KEY (street_arm_id)
+REFERENCES public.shp_street_lights (gid)
+ON DELETE CASCADE
+ON UPDATE CASCADE
+              </div>
+              <div class="other-info">
+              <div class="timestamp">18:54:54</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="18:54:40">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  select * from public.tbl_web_street_arms limit 10
+              </div>
+              <div class="other-info">
+              <div class="timestamp">18:54:40</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="18:53:33">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  ALTER TABLE public.tbl_web_street_arms
+ADD CONSTRAINT fk_street_light_id
+FOREIGN KEY (street_light_id)
+REFERENCES public.shp_street_lights (gid)
+ON DELETE CASCADE
+ON UPDATE CASCADE
+              </div>
+              <div class="other-info">
+              <div class="timestamp">18:53:33</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="18:53:22">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  ALTER TABLE public.tbl_web_street_arms
+ADD CONSTRAINT fk_street_light_id
+FOREIGN KEY (street_light_id)
+REFERENCES public.public.shp_street_lights (gid)
+ON DELETE CASCADE
+ON UPDATE CASCADE
+              </div>
+              <div class="other-info">
+              <div class="timestamp">18:53:22</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="18:52:26">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  ALTER TABLE public.tbl_web_street_arms
+ADD CONSTRAINT fk_street_light_id
+FOREIGN KEY (street_light_id)
+REFERENCES public.public.shp_street_lights (gid)
+ON DELETE CASCADE
+ON UPDATE CASCADE
+              </div>
+              <div class="other-info">
+              <div class="timestamp">18:52:26</div>
+              </div>
+          </div>
+      </li><li class="list-item pgadmin-query-history-entry" tabindex="0" data-key="18:40:55">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg icon-view-data" role="img"></span>
+                  SELECT * FROM public.shp_street_lights
+ORDER BY gid ASC LIMIT 100
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">18:40:55</div>
+              </div>
+          </div>
+      </li></ul>
+        </div><div class="query-group" data-key="2024 06 25">
+            <div class="date-label">Yesterday - 6/25/2024</div>
+            <ul class="query-entries"><li class="list-item pgadmin-query-history-entry" tabindex="0" data-key="10:18:12">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg icon-view-data" role="img"></span>
+                  SELECT * FROM public.tbl_user_master
+ORDER BY user_id ASC 
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:18:12</div>
+              </div>
+          </div>
+      </li></ul>
+        </div><div class="query-group" data-key="2024 06 20">
+            <div class="date-label">6/20/2024</div>
+            <ul class="query-entries"><li class="list-item" tabindex="0" data-key="10:48:08">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_search_layer(text)
+
+-- DROP FUNCTION public.fn_web_search_layer(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_search_layer(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_keyword text;
+	_table_name text;
+	exists_flag BOOLEAN;
+	sql_query text;
+	json_data JSON;
+		
+BEGIN	
+		--select * from public.shp_ward_boundary limit 10
+		-- select from fn_web_search_layer('{"keyword":"Naigaon","table_name":"metro_station_old"}')
+		-- SELECT * from tbl_parent_layer_master 
+		-- SELECT * from tbl_web_layer_master 
+		-- select * from metro_station_old limit 10
+		-- SELECT * from tbl_error_log order by created_on desc limit 10
+
+		raise notice '%',userjson;
+		json_data := cast(userjson AS JSON) :: JSON;
+		_keyword 		:= json_data -&gt;&gt; 'keyword';
+		_table_name 	:= json_data -&gt;&gt; 'table_name';
+	
+		RAISE NOTICE '_keyword: %', _keyword;
+		RAISE NOTICE 'table_name: %', _table_name;
+
+		IF _keyword != '' AND _table_name != '' THEN
+
+			 sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+			''[]''),''responseMessage'',''ok'')::text as data
+			FROM (
+				SELECT 
+				tbl.gid,
+				tbl.name,
+				 ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric as long,
+				  ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric as lat
+				                
+				  
+				from '||_table_name||' tbl WHERE name ilike ''%'||_keyword||'%''
+			)data1;';
+		ELSE
+			sql_query := 'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''layer name does not exist.'')::text as data;';
+		END IF;
+	
+	RAISE NOTICE 'sql_query: %', sql_query;
+ 
+ 	RETURN QUERY EXECUTE sql_query;
+   
+	EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+				SELECT p_errorline,p_errormessage||':fn_web_search_layer',p_errorstate,timezone('Asia/Kolkata'::text, now());
+
+		END;
+		sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';
+		RETURN QUERY EXECUTE sql_query;
+    END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_search_layer(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:48:08</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:46:19">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_search_layer(text)
+
+-- DROP FUNCTION public.fn_web_search_layer(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_search_layer(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_keyword text;
+	_table_name text;
+	exists_flag BOOLEAN;
+	sql_query text;
+	json_data JSON;
+		
+BEGIN	
+		--select * from public.shp_ward_boundary limit 10
+		-- select from fn_web_search_layer('{"keyword":"Naigaon","table_name":"metro_station_old"}')
+		-- SELECT * from tbl_parent_layer_master 
+		-- SELECT * from tbl_web_layer_master 
+		-- select * from metro_station_old limit 10
+		-- SELECT * from tbl_error_log order by created_on desc limit 10
+
+		raise notice '%',userjson;
+		json_data := cast(userjson AS JSON) :: JSON;
+		_keyword 		:= json_data -&gt;&gt; 'keyword';
+		_table_name 	:= json_data -&gt;&gt; 'table_name';
+	
+		RAISE NOTICE '_keyword: %', _keyword;
+		RAISE NOTICE 'table_name: %', _table_name;
+
+		IF _keyword != '' AND _table_name != '' THEN
+
+			 sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+			''[]''),''responseMessage'',''ok'')::text as data
+			FROM (
+				SELECT 
+				tbl.gid,
+				tbl.name,
+				 ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric as long,
+				  ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric as lat
+				                
+				  
+				from '||_table_name||' tbl WHERE name ilike ''%'||_keyword||'%''
+			)data1;';
+		ELSE
+			sql_query := 'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''layer name does not exist.'')::text as data;';
+		END IF;
+	
+	RAISE NOTICE 'sql_query: %', sql_query;
+ 
+ 	RETURN QUERY EXECUTE sql_query;
+   
+	EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+				SELECT p_errorline,p_errormessage||':fn_web_search_layer',p_errorstate,timezone('Asia/Kolkata'::text, now());
+
+		END;
+		sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';
+		RETURN QUERY EXECUTE sql_query;
+    END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_search_layer(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:46:19</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:45:56">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_search_layer(text)
+
+-- DROP FUNCTION public.fn_web_search_layer(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_search_layer(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_keyword text;
+	_table_name text;
+	exists_flag BOOLEAN;
+	sql_query text;
+	json_data JSON;
+		
+BEGIN	
+		--select * from public.shp_ward_boundary limit 10
+		-- select from fn_web_search_layer('{"keyword":"Naigaon","table_name":"metro_station_old"}')
+		-- SELECT * from tbl_parent_layer_master 
+		-- SELECT * from tbl_web_layer_master 
+		-- select * from metro_station_old limit 10
+		-- SELECT * from tbl_error_log order by created_on desc limit 10
+
+		raise notice '%',userjson;
+		json_data := cast(userjson AS JSON) :: JSON;
+		_keyword 		:= json_data -&gt;&gt; 'keyword';
+		_table_name 	:= json_data -&gt;&gt; 'table_name';
+	
+		RAISE NOTICE '_keyword: %', _keyword;
+		RAISE NOTICE 'table_name: %', _table_name;
+
+		IF _keyword != '' AND _table_name != '' THEN
+
+			 sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+			''[]''),''responseMessage'',''ok'')::text as data
+			FROM (
+				SELECT 
+				tbl.gid,
+				tbl.name,
+				 ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric as long
+				                
+				  
+				from '||_table_name||' tbl WHERE name ilike ''%'||_keyword||'%''
+			)data1;';
+		ELSE
+			sql_query := 'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''layer name does not exist.'')::text as data;';
+		END IF;
+	
+	RAISE NOTICE 'sql_query: %', sql_query;
+ 
+ 	RETURN QUERY EXECUTE sql_query;
+   
+	EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+				SELECT p_errorline,p_errormessage||':fn_web_search_layer',p_errorstate,timezone('Asia/Kolkata'::text, now());
+
+		END;
+		sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';
+		RETURN QUERY EXECUTE sql_query;
+    END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_search_layer(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:45:56</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:43:47">
+          <div class="entry ">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  -- FUNCTION: public.fn_web_search_layer(text)
+
+-- DROP FUNCTION public.fn_web_search_layer(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_search_layer(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	_keyword text;
+	_table_name text;
+	exists_flag BOOLEAN;
+	sql_query text;
+	json_data JSON;
+		
+BEGIN	
+		--select * from public.shp_ward_boundary limit 10
+		-- select from fn_web_search_layer('{"keyword":"Naigaon","table_name":"metro_station_old"}')
+		-- SELECT * from tbl_parent_layer_master 
+		-- SELECT * from tbl_web_layer_master 
+		-- select * from metro_station_old limit 10
+		-- SELECT * from tbl_error_log order by created_on desc limit 10
+
+		raise notice '%',userjson;
+		json_data := cast(userjson AS JSON) :: JSON;
+		_keyword 		:= json_data -&gt;&gt; 'keyword';
+		_table_name 	:= json_data -&gt;&gt; 'table_name';
+	
+		RAISE NOTICE '_keyword: %', _keyword;
+		RAISE NOTICE 'table_name: %', _table_name;
+
+		IF _keyword != '' AND _table_name != '' THEN
+
+			 sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+			''[]''),''responseMessage'',''ok'')::text as data
+			FROM (
+				SELECT 
+				tbl.gid,
+				tbl.name,
+				 json_build_object(''long'',ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+				                
+				 ) as geom 
+				from '||_table_name||' tbl WHERE name ilike ''%'||_keyword||'%''
+			)data1;';
+		ELSE
+			sql_query := 'SELECT json_build_object(''responseCode'', 201, ''responseMessage'', ''layer name does not exist.'')::text as data;';
+		END IF;
+	
+	RAISE NOTICE 'sql_query: %', sql_query;
+ 
+ 	RETURN QUERY EXECUTE sql_query;
+   
+	EXCEPTION WHEN OTHERS 
+		THEN
+			DECLARE p_errormessage VARCHAR(4000);
+			DECLARE p_errorstate VARCHAR(4000);
+			DECLARE p_errorline VARCHAR(4000);
+
+			BEGIN									
+				p_errormessage:= SQLERRM;
+				p_errorstate:= SQLSTATE;
+				GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+				INSERT INTO tbl_error_log(error_name,error_callstack,error_method,created_on)		
+				SELECT p_errorline,p_errormessage||':fn_web_search_layer',p_errorstate,timezone('Asia/Kolkata'::text, now());
+
+		END;
+		sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';
+		RETURN QUERY EXECUTE sql_query;
+    END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_search_layer(text)
+    OWNER TO postgres;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:43:47</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:40:42">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                      SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%a%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:40:42</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:40:42">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                      SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%a%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:40:42</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:40:41">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                      SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%a%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:40:41</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:40:40">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                      SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%a%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:40:40</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:40:22">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                      SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%Naigaon%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:40:22</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:40:00">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                      SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            ''long'', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            ''lat'', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%Naigaon%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:40:00</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:39:20">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                   SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%Naigaon%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:39:20</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:39:15">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  		
+				SELECT json_build_object(
+    'responseCode', 200,
+    'data', COALESCE(to_json(array_agg(data1)), '[]'),
+    'responseMessage', 'ok'
+)::text as data
+FROM (
+    SELECT 
+        tbl.gid,
+        tbl.name,
+        json_build_object(
+            'long', ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+            'lat', ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+        ) as geom 
+    FROM metro_station_old tbl 
+    WHERE tbl.name ILIKE '%Naigaon%'
+) data1;
+
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:39:15</div>
+              </div>
+          </div>
+      </li><li class="list-item" tabindex="0" data-key="10:38:18">
+          <div class="entry error">
+              <div class="query">
+                  <span id="query_source_icon" class="query-history-icon sql-icon-lg fa fa-play" role="img"></span>
+                  SELECT json_build_object('responseCode',200,'data',COALESCE(to_json(array_agg(data1)), 
+			'[]'),'responseMessage','ok')::text as data
+			FROM (
+				SELECT 
+				tbl.gid,
+				tbl.name,
+				 json_build_object('long',ST_X(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric,
+				                  'lat',ST_Y(ST_Transform(ST_Centroid((ST_Dump(tbl.geom)).geom), 4326))::numeric
+				 ) as geom 
+				from metro_station_old tbl WHERE name ilike %Naigaon%'
+              </div>
+              <div class="other-info">
+              <div class="timestamp">10:38:18</div>
+              </div>
+          </div>
+      </li></ul>
+        </div></div>
+        </div></div><div class="gutter gutter-horizontal" style="width: 1px;"></div><div style="width: calc(50% - 0.5px);"><div id="query_detail" class="query-detail">
+            <div class="error-message-block d-none"></div>
+            <div class="info-message-block d-none"></div>
+            <div class="metadata-block"><div class="metadata"><div class="item">
+                  <span class="value">6/27/2024 12:36:22 PM</span>
+                  <span class="description">Date</span>
+              </div><div class="item">
+                  <span class="value">-1</span>
+                  <span class="description">Rows Affected</span>
+              </div><div class="item">
+                  <span class="value">256 msec</span>
+                  <span class="description">Duration</span>
+              </div></div></div>
+            <div class="query-statement-block">
+              <div id="history-detail-query">
+                <button class="btn-copy copy-all" tabindex="0" accesskey="y">Copy</button>
+                <button class="btn-copy-editor copy-to-editor" tabindex="0" accesskey="y">Copy to Query Editor</button>
+                <div><div class="CodeMirror cm-s-default" style="font-size: 1em;"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 0px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" readonly="" tabindex="-1" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" tabindex="-1" cm-not-content="true" style="display: block; bottom: 0px;"><div style="min-width: 1px; height: 119px;"></div></div><div class="CodeMirror-hscrollbar" tabindex="-1" cm-not-content="true" style="display: block; right: 0px; left: 0px;"><div style="height: 100%; min-height: 1px; width: 53px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 3px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"><pre class="CodeMirror-line" role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-comment">-- FUNCTION: public.fn_web_delete_streetlight_arms(text)</span></span></pre></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" role="presentation"></div></div></div></div></div><div style="position: absolute; height: 50px; width: 1px; border-bottom: 0px solid transparent;"></div><div class="CodeMirror-gutters" style="display: none;"></div></div></div></div>
+              </div>
+            </div>
+            <div>
+              <hr class="block-divider">
+            </div>
+            <div class="message-block">
+              <div class="message">
+                <div class="message-header">Messages</div>
+                <div class="content"><pre class="content-value">ALTER FUNCTION
+
+Query returned successfully in 256 msec.</pre></div>
+              </div>
+            </div>
+        </div></div></div></div></td></tr></tbody></table></div></div></div></div><div class="wcLayoutPane" style="right: 0px; width: 103px; top: 0px; bottom: 0px;"><div class="wcFrame wcWide wcTall"><div class="wcFrameTitleBar wcTabTop" style="width: 0px;"><div class="wcFrameTitle"><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Scratch Pad</a></div><div class="wcTabScroller" style="left: 0px;"></div><div class="wcFrameButtonBar" style="min-width: 48px; width: 48px; right: 24px;"><div class="wcFrameButton" title="Scroll tabs to the left." aria-label="Scroll left" tabindex="0"><span class="fa fa-chevron-left"></span></div><div class="wcFrameButton" title="Scroll tabs to the right." aria-label="Scroll right" tabindex="0"><span class="fa fa-chevron-right"></span></div></div></div><div class="wcFrameButtonBar" style="min-width: 24px; width: 24px;"><div class="wcFrameButton" title="Close the currently active panel tab" aria-label="Close panel" tabindex="0" style=""><div class="fa fa-times"></div></div><div class="wcFrameButton" title="Collapse the active panel" style="display: none;"><div class="fa fa-download"></div>C</div></div><div class="wcFrameCenter wcPanelBackground wcScrollableX wcScrollableY" style="left: 0px; right: 0px; bottom: 0px;"><div class="wcPanelTabContent" id="0"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content"><div class="sql-scratch"><textarea wrap="off" tabindex="0"></textarea></div></div></td></tr></tbody></table></div></div></div></div><div class="wcSplitterBar wcTall wcSplitterBarV" style="left: -107px; top: 0px; height: 0px;"><div class="wcSplitterBarLine"></div></div></div><div class="wcLayoutPane" style="bottom: 0px; height: 103px; left: 0px; right: 0px;"><div class="wcFrame wcWide wcTall"><div class="wcFrameTitleBar wcTabTop" style="width: 0px;"><div class="wcTabScroller" style="left: 0px;"><div class="wcPanelTab" id="0"><div><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Data Output</a></div></div><div class="wcPanelTab" id="1"><div><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Explain</a></div></div><div class="wcPanelTab wcPanelTabActive" id="2"><div><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Messages</a></div></div><div class="wcPanelTab" id="3"><div><a href="http://127.0.0.1:51504/datagrid/panel/647925?is_query_tool=true&amp;sgid=1&amp;sid=2&amp;server_type=pg&amp;did=1094573#" tabindex="-1" class="panel-link-heading">Notifications</a></div></div></div><div class="wcFrameButtonBar" style="min-width: 0px; width: 0px; right: 0px;"></div></div><div class="wcFrameButtonBar" style="min-width: 0px; width: 0px;"><div class="wcFrameButton" title="Close the currently active panel tab" aria-label="Close panel" tabindex="0" style="display: none;"><div class="fa fa-times"></div></div><div class="wcFrameButton" title="Collapse the active panel" style="display: none;"><div class="fa fa-download"></div>C</div></div><div class="wcFrameCenter wcPanelBackground wcScrollableX wcScrollableY" style="left: 0px; right: 0px; bottom: 0px;"><div class="wcPanelTabContent wcPanelTabContentHidden" id="0"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content hide-vertical-scrollbar"><div id="datagrid" class="sql-editor-grid-container text-12 ui-widget" tabindex="0" style="height: 359.25px; overflow: hidden; outline: 0px; position: relative;"></div></div></td></tr></tbody></table></div><div class="wcPanelTabContent wcPanelTabContentHidden" id="1"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content"><div class="sql-editor-explain pg-el-container" tabindex="0"><div role="status" class="pg-panel-message">Use Explain/Explain analyze button to generate the plan for a query. Alternatively, you can also execute "EXPLAIN (FORMAT JSON) [QUERY]".</div></div></div></td></tr></tbody></table></div><div class="wcPanelTabContent" id="2"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content"><div role="status" class="sql-editor-message" tabindex="0">ALTER FUNCTION
+
+Query returned successfully in 256 msec.</div></div></td></tr></tbody></table></div><div class="wcPanelTabContent wcPanelTabContentHidden" id="3"><table class="wcLayout wcWide wcTall"><tbody><tr><td><div class="pg-panel-content"><div id="notification_grid" class="sql-editor-notifications" tabindex="0"><table class="backgrid presentation table table-bordered table-hover table-noouter-border table-bottom-border" role="table"><thead><tr><th class="sortable renderable recorded_time" role="columnheader"><button>Recorded time<span class="sort-caret" aria-hidden="true"></span></button></th><th class="sortable renderable channel" role="columnheader"><button>Event<span class="sort-caret" aria-hidden="true"></span></button></th><th class="sortable renderable pid" role="columnheader"><button>Process ID<span class="sort-caret" aria-hidden="true"></span></button></th><th class="sortable renderable payload" role="columnheader"><button>Payload<span class="sort-caret" aria-hidden="true"></span></button></th></tr></thead><tbody><tr class="empty"><td colspan="4"><span>No data found</span></td></tr></tbody></table></div></div></td></tr></tbody></table></div></div></div></div><div class="wcSplitterBar wcWide wcSplitterBarH" style="top: -107px; left: 0px;"><div class="wcSplitterBarLine"></div></div></div></div>
+    </div>
+</div>
+<script>
+            require(['sources/generated/browser_nodes', 'sources/generated/codemirror', 'sources/generated/slickgrid'], function() {
+    require(['sources/generated/sqleditor'], function(ctx) {
+        var $ = pgAdmin.SqlEditor.jquery,
+            S = pgAdmin.SqlEditor.S,
+            editorPanel = $('.sql-editor'),
+            loadingDiv = $('#fetching_data'),
+            msgDiv = loadingDiv.find('.sql-editor-busy-text');
+
+        // Register unload event on window close.
+        /* If opened in new tab, close the connection only on tab/window close and
+         * not on refresh attempt because the user may cancel the reload
+         */
+        if(window.opener) {
+          $(window).on('unload', function(ev) {
+            $.ajax({
+              method: 'DELETE',
+              url: "/datagrid/" + "close/" + 647925
+            });
+          });
+        } else {
+          $(window).on('beforeunload', function(ev) {
+            $.ajax({
+              method: 'DELETE',
+              url: "/datagrid/" + "close/" + 647925
+            });
+          });
+        }
+
+        // Get the controller object from pgAdmin.SqlEditor
+        var sqlEditorController = pgAdmin.SqlEditor.create(editorPanel);
+
+        // Listen on events to show/hide loading-icon and change messages.
+        sqlEditorController.on('pgadmin-sqleditor:loading-icon:message', function(msg) {
+            msgDiv.text(msg);
+          }).on('pgadmin-sqleditor:loading-icon:show', function(msg) {
+            loadingDiv.removeClass('d-none');
+            msgDiv.text(msg);
+          }).on('pgadmin-sqleditor:loading-icon:hide', function() {
+            loadingDiv.addClass('d-none');
+          });
+                    var script_type_url = '';
+                // Start the query tool.
+
+        sqlEditorController.start(
+            647925,
+            {"is_query_tool": "true", "sgid": "1", "sid": "2", "server_type": "pg", "did": "1094573", "title": "digital_twin/postgres@staging", "query_url": "/browser/table/insert_sql/1/2/1094573/2200/1144786"},
+            '{"floating":[],"root":{"type":"wcSplitter","horizontal":false,"isDrawer":false,"pane0":{"type":"wcSplitter","horizontal":true,"isDrawer":false,"pane0":{"type":"wcFrame","floating":false,"isFocus":false,"tabOrientation":"top","pos":{"x":0.5,"y":0.5},"size":{"x":1081.365,"y":229.96875},"tab":0,"panels":[{"type":"wcPanel","panelType":"sql_panel","size":{"x":1081.365,"y":229.96875},"customData":{}},{"type":"wcPanel","panelType":"history","size":{"x":1441.82,"y":229.96875},"customData":{}}]},"pane1":{"type":"wcFrame","floating":false,"isFocus":false,"tabOrientation":"top","pos":{"x":0.5,"y":0.5},"size":{"x":360.455,"y":229.96875},"tab":0,"panels":[{"type":"wcPanel","panelType":"scratch","size":{"x":360.455,"y":229.96875},"customData":{}}]},"pos":0.749994070256611},"pane1":{"type":"wcFrame","floating":false,"isFocus":false,"tabOrientation":"top","pos":{"x":0.5,"y":0.5},"size":{"x":1441.82,"y":696.875},"tab":2,"panels":[{"type":"wcPanel","panelType":"data_output","size":{"x":1441.82,"y":696.875},"customData":{}},{"type":"wcPanel","panelType":"explain","size":{"x":1441.82,"y":696.875},"customData":{}},{"type":"wcPanel","panelType":"messages","size":{"x":1441.82,"y":696.875},"customData":{}},{"type":"wcPanel","panelType":"notifications","size":{"x":1441.82,"y":696.875},"customData":{}}]},"pos":0.5}}',
+            []
+        );
+
+        // If opening from schema diff, set the generated script to the SQL Editor
+
+        var schema_ddl_diff = (window.opener !== null) ? window.opener.pgAdmin.ddl_diff : (window.parent !== null) ? window.parent.pgAdmin.ddl_diff : window.top.pgAdmin.ddl_diff;
+        sqlEditorController.set_value_to_editor(schema_ddl_diff);
+        if (window.opener !== null) window.opener.pgAdmin.ddl_diff = '';
+        else if (window.parent !== null) window.parent.pgAdmin.ddl_diff = '';
+        else if (window.top !== null) window.top.pgAdmin.ddl_diff = '';
+
+    });
+});
+
+</script>
+
+
+<div class="alertify ajs-hidden  ajs-movable ajs-pinnable ajs-zoom"><div class="ajs-dimmer"></div><div class="ajs-modal" tabindex="0"><div class="ajs-dialog" tabindex="0"><button class="ajs-reset" aria-label="reset"></button><div class="ajs-commands"><button class="ajs-pin" aria-label="Pin"></button><button class="ajs-maximize" aria-label="Maximize" tabindex="0"></button><button class="ajs-close" aria-label="Close"></button></div><div class="ajs-header">AlertifyJS</div><div class="ajs-body"><div class="ajs-content"></div></div><div class="ajs-footer"><div class="ajs-auxiliary ajs-buttons"></div><div class="ajs-primary ajs-buttons"><button class="ajs-button btn btn-secondary fa fa-lg fa-times pg-alertify-button">Cancel</button><button class="ajs-button btn btn-primary fa fa-lg fa-check pg-alertify-button">OK</button></div></div><div class="ajs-handle"></div><button class="ajs-reset" aria-label="reset"></button></div></div></div><div class="alertify ajs-hidden  ajs-movable ajs-pinnable ajs-zoom"><div class="ajs-dimmer"></div><div class="ajs-modal" tabindex="0"><div class="ajs-dialog" tabindex="0"><button class="ajs-reset" aria-label="reset"></button><div class="ajs-commands"><button class="ajs-pin" aria-label="Pin"></button><button class="ajs-maximize" aria-label="Maximize" tabindex="0"></button><button class="ajs-close" aria-label="Close"></button></div><div class="ajs-header">AlertifyJS</div><div class="ajs-body"><div class="ajs-content"><p></p><label for="alertify-prompt-0" style="display: none;">HiddenLabel</label><input class="form-control" type="text" id="alertify-prompt-0"></div></div><div class="ajs-footer"><div class="ajs-auxiliary ajs-buttons"></div><div class="ajs-primary ajs-buttons"><button class="ajs-button btn btn-secondary fa fa-lg fa-times pg-alertify-button">Cancel</button><button class="ajs-button btn btn-primary fa fa-lg fa-check pg-alertify-button">OK</button></div></div><div class="ajs-handle"></div><button class="ajs-reset" aria-label="reset"></button></div></div></div><div class="alertify ajs-hidden  ajs-movable ajs-pinnable ajs-zoom"><div class="ajs-dimmer"></div><div class="ajs-modal" tabindex="0"><div class="ajs-dialog" tabindex="0"><button class="ajs-reset" aria-label="reset"></button><div class="ajs-commands"><button class="ajs-pin" aria-label="Pin"></button><button class="ajs-maximize" aria-label="Maximize" tabindex="0"></button><button class="ajs-close" aria-label="Close"></button></div><div class="ajs-header">AlertifyJS</div><div class="ajs-body"><div class="ajs-content"></div></div><div class="ajs-footer"><div class="ajs-auxiliary ajs-buttons"></div><div class="ajs-primary ajs-buttons"><button class="ajs-button btn btn-primary fa fa-lg fa-check pg-alertify-button">OK</button></div></div><div class="ajs-handle"></div><button class="ajs-reset" aria-label="reset"></button></div></div></div><div class="alertify-notifier ajs-bottom ajs-right"></div></body></html>
