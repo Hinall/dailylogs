@@ -5043,7 +5043,22 @@ DECLARE
 	END;
 $BODY$;
 
+--------------------------________________________________________________________________________________________________1/7/24
+select * from shp_street_lights order by gid desc limit 10
+select * from 	public.tbl_web_street_arms limit 10
+select * from shp_street_lights limit 10
 
+
+ALTER TABLE public.tbl_web_street_arms
+ADD CONSTRAINT pk_pole_id(pol)
+FOREIGN KEY (gid)
+REFERENCES public.shp_street_lights (gid)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+
+ALTER TABLE public.tbl_web_street_arms
+add CONSTRAINT pk_street_light_id primary key (street_arm_id)
 
 
 
