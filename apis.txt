@@ -5128,7 +5128,18 @@ constructor(private http:HttpClient){};
     });
   
     this.map.addLayer(this.vector);
-✔  create path using coords (ors used)
+✔  create path using coords (ors api used)
+
+another method of ors to create path:
+
+    this.orsDirections = new Openrouteservice.Directions({
+      api_key: "5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb",
+      host: "https://api.openrouteservice.org"
+    });
+
+    this.getDirections([75.352478, 19.901054], [72.877426, 19.076090]);
+
+✔  create path using coords (ors api and method used)
 ------------------------------------------------------------------
 
 
