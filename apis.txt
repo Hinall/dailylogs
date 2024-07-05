@@ -5072,7 +5072,48 @@ ________________________________________________________________________________
    
 
 };
-
 ✔ find lat long on click
+-------------------------------------------------------------------------------------
+
+ ol: any = window['ol'];
+  state = "closed";
+  osm: any;
+  map: any;
+  source = new this.ol.source.Vector();
+
+  vector = new this.ol.layer.Vector({
+    source: this.source,
+    style: new this.ol.style.Style({
+      stroke: new this.ol.style.Stroke({
+        color: '#0efa7d',
+        width: 4
+      })
+    })
+  });
+
+  view: any;
+  orsDirections: any;
+  geojsondata:any;
+constructor(private http:HttpClient){};
+
+  ngOnInit(): void {
+    this.osm = new this.ol.layer.Tile({
+      source: new this.ol.source.OSM()
+    });
+
+    this.view = new this.ol.View({
+      projection: 'EPSG:3857',
+      center: this.ol.proj.fromLonLat([75.352478, 19.901054]),
+      zoom: 12
+    });
+
+    this.map = new this.ol.Map({
+      layers: [this.osm],
+      target: 'map',
+      view: this.view
+    });
+
+✔plot ol layer map  
+--------------------------------------------------------
 
 
