@@ -5061,6 +5061,18 @@ ALTER TABLE public.tbl_web_street_arms
 add CONSTRAINT pk_street_light_id primary key (street_arm_id)
 
 
+_________________________________________________________________________________________________________________5/7/24
+<div id="map" (click)='findCoords($event)'></div>
 
+  findCoords(evt:any) {
+
+    const coordinate = this.map.getEventCoordinate(evt);
+    alert(coordinate);
+
+   
+
+};
+
+✔ find lat long on click
 
 
