@@ -5116,4 +5116,19 @@ constructor(private http:HttpClient){};
 ✔plot ol layer map  
 --------------------------------------------------------
 
+ 
+    this.http.get("https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb&start=72.508511,23.027203&end=70.801009,21.973743").subscribe((data)=>{
+      const format = new this.ol.format.GeoJSON();
+      const features = format.readFeatures(data, {
+        featureProjection: 'EPSG:3857' // Ensure the projection is correct
+      });
+      this.source.addFeatures(features);
+    }, error => {
+      console.error('Error fetching route data:', error);
+    });
+  
+    this.map.addLayer(this.vector);
+✔  create path using coords (ors used)
+------------------------------------------------------------------
+
 
