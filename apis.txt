@@ -5074,8 +5074,119 @@ ________________________________________________________________________________
 };
 ✔ find lat long on click
 -------------------------------------------------------------------------------------
+ol: any = window['ol'];
+  osm: any;
+  map: any;
+  pointStyle:any;
+  view: any;
+  vector: any;
+  source: any;
+  geojsondata:any;
+  // orsDirections: any;
+  
 
- ol: any = window['ol'];
+constructor(private http:HttpClient){};
+
+  ngOnInit(): void {
+    this.osm = new this.ol.layer.Tile({
+      source: new this.ol.source.OSM()
+    });
+
+    this.view = new this.ol.View({
+      projection: 'EPSG:4326',
+      center: [75.352478, 19.901054],
+      zoom: 12
+    });
+
+    this.map = new this.ol.Map({
+      layers: [this.osm],
+      target: 'map',
+      view: this.view
+    });
+    this.pointStyle = new this.ol.style.Style({
+      image: new this.ol.style.Icon({
+          anchor: [0.5, 1],
+          src: 'https://apagri.infinium.management/temp/point_icon.png',
+      })
+  });
+   
+  }
+
+✔plot ol layer map  
+--------------------------------------------------------
+
+ findCoords(evt:any) {
+
+    const coordinate = this.map.getEventCoordinate(evt);
+    console.log(coordinate);
+    const transformedCoordinate = this.ol.proj.toLonLat(coordinate);
+    console.log(transformedCoordinate);
+    let addMarkserFeature = new this.ol.Feature({
+      geometry: new this.ol.geom.Point(this.ol.proj.fromLonLat(transformedCoordinate)),
+      featureProjection: 'EPSG:4326',
+  });
+✔find coords
+-------------------------------------------------------------
+
+ let addMarkserFeature = new this.ol.Feature({
+      geometry: new this.ol.geom.Point(this.ol.proj.fromLonLat(transformedCoordinate)),
+      featureProjection: 'EPSG:4326',
+  });
+
+    var vector_layer = new this.ol.layer.Vector({
+      source: new this.ol.source.Vector({ features: [addMarkserFeature] })
+    });
+
+    addMarkserFeature.setStyle(this.pointStyle);
+    this.map.addLayer(vector_layer);
+
+
+✔plot marker->1)new feature with feature projection 
+		2)new vectorlayer to new source
+		3)addStyle
+-----------------------------------------------------------
+
+ 
+    this.http.get("https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb&start=72.508511,23.027203&end=70.801009,21.973743").subscribe((data)=>{
+      const format = new this.ol.format.GeoJSON();
+      const features = format.readFeatures(data, {
+        featureProjection: 'EPSG:3857' // Ensure the projection is correct
+      });
+      this.source.addFeatures(features);
+    }, error => {
+      console.error('Error fetching route data:', error);
+    });
+  
+    this.map.addLayer(this.vector);
+✔  create path using coords (ors api used)
+
+another method of ors to create path:
+
+    this.orsDirections = new Openrouteservice.Directions({
+      api_key: "5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb",
+      host: "https://api.openrouteservice.org"
+    });
+
+    this.getDirections([75.352478, 19.901054], [72.877426, 19.076090]);
+
+✔  create path using coords (ors api and method used)
+------------------------------------------------------------------
+working code on 3-7-24
+
+import { Component, OnInit } from '@angular/core';
+import Openrouteservice from 'openrouteservice-js';
+import GeoJSON from 'geojson';
+import { HttpClient } from '@angular/common/http';
+
+
+@Component({
+  selector: 'app-direction',
+  standalone: true,
+  templateUrl: './direction.component.html',
+  styleUrls: ['./direction.component.scss']
+})
+export class DirectionComponent implements OnInit {
+  ol: any = window['ol'];
   state = "closed";
   osm: any;
   map: any;
@@ -5113,10 +5224,7 @@ constructor(private http:HttpClient){};
       view: this.view
     });
 
-✔plot ol layer map  
---------------------------------------------------------
-
- 
+   
     this.http.get("https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb&start=72.508511,23.027203&end=70.801009,21.973743").subscribe((data)=>{
       const format = new this.ol.format.GeoJSON();
       const features = format.readFeatures(data, {
@@ -5128,18 +5236,163 @@ constructor(private http:HttpClient){};
     });
   
     this.map.addLayer(this.vector);
-✔  create path using coords (ors api used)
+    // this.orsDirections = new Openrouteservice.Directions({
+    //   api_key: "5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb",
+    //   host: "https://api.openrouteservice.org"
+    // });
 
-another method of ors to create path:
+    // Example of fetching directions
+    // this.getDirections([75.352478, 19.901054], [72.877426, 19.076090]);
+  }
 
-    this.orsDirections = new Openrouteservice.Directions({
-      api_key: "5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb",
-      host: "https://api.openrouteservice.org"
+  getDirections(start: number[], end: number[]): void {
+    this.orsDirections.calculate({
+      coordinates: [start, end],
+      profile: 'driving-car',
+      format: 'geojson'
+    })
+    .then((json: any) => {
+      console.log(json);
+
+      // Assuming geojson contains a feature collection
+      const features = new this.ol.format.GeoJSON().readFeatures(json, {
+        featureProjection: 'EPSG:3857'
+      });
+
+      this.source.addFeatures(features);
+    })
+    .catch((error: any) => {
+      console.error(error);
     });
+  }
+}
+----------------------------------------------
+5-7-24 todays cod enot working
 
-    this.getDirections([75.352478, 19.901054], [72.877426, 19.076090]);
+import { Component, OnInit } from '@angular/core';
+import Openrouteservice from 'openrouteservice-js';
+import GeoJSON from 'geojson';
+import { HttpClient } from '@angular/common/http';
+import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { fromLonLat,toLonLat, transform } from 'ol/proj';
 
-✔  create path using coords (ors api and method used)
-------------------------------------------------------------------
+@Component({
+  selector: 'app-direction',
+  imports:[SharedModule, NgbDropdownModule],
+  standalone: true,
+  templateUrl: './direction.component.html',
+  styleUrls: ['./direction.component.scss']
+})
+export class DirectionComponent implements OnInit {
+  ol: any = window['ol'];
+  osm: any;
+  map: any;
+  pointStyle:any;
+  view: any;
+  vector: any;
+  source: any;
+  geojsondata:any;
+  orsDirections: any;
+  
 
+constructor(private http:HttpClient){
 
+  this.orsDirections = new Openrouteservice.Directions({
+    api_key: "5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb",
+    host: "https://api.openrouteservice.org"
+  });
+};
+
+ngOnInit(): void {
+  // Initialize OpenStreetMap layer
+  this.osm = new this.ol.layer.Tile({
+    source: new this.ol.source.OSM()
+  });
+
+  // Initialize map view with EPSG:3826 projection
+  this.view = new this.ol.View({
+    projection: 'EPSG:3826',
+    center: [12982929.22, 4832347.66], // Example center coordinates in EPSG:3826
+    zoom: 12
+  });
+
+  // Initialize vector source for features
+  this.source = new this.ol.source.Vector();
+
+  // Initialize vector layer for displaying features
+  this.vector = new this.ol.layer.Vector({
+    source: this.source
+  });
+
+  // Initialize the map with layers and view
+  this.map = new this.ol.Map({
+    layers: [this.osm, this.vector],
+    target: 'map',
+    view: this.view
+  });
+
+  // Style for the marker point
+  this.pointStyle = new this.ol.style.Style({
+    image: new this.ol.style.Icon({
+      anchor: [0.5, 1],
+      src: 'https://apagri.infinium.management/temp/point_icon.png',
+    })
+  });
+
+  // Fetch and display directions
+  this.getDirections([12982929.22, 4832347.66], [13023921.18, 4826952.83]); // Example coordinates in EPSG:3826
+}
+
+ 
+  getDirections(start: number[], end: number[]): void {
+    this.orsDirections.calculate({
+      coordinates: [transform(start, 'EPSG:3826', 'EPSG:4326'), transform(end, 'EPSG:3826', 'EPSG:4326')],
+      profile: 'driving-car',
+      format: 'geojson'
+    })
+    .then((json: any) => {
+      console.log(json);
+
+      // Assuming geojson contains a feature collection
+      const features = new this.ol.format.GeoJSON().readFeatures(json, {
+        featureProjection: 'EPSG:3826'
+      });
+
+      this.source.addFeatures(features);
+    })
+    .catch((error: any) => {
+      console.error(error);
+    });
+  }
+
+  
+
+  findCoords(evt: any): void {
+    const coordinate = this.map.getEventCoordinate(evt);
+    console.log('Event coordinate:', coordinate);
+  
+    const transformedCoordinate = transform(coordinate, 'EPSG:4326', 'EPSG:3826');
+    console.log('Transformed coordinate:', transformedCoordinate);
+  
+    let addMarkerFeature = new this.ol.Feature({
+      geometry: new this.ol.geom.Point(transformedCoordinate)
+    });
+  
+    addMarkerFeature.setStyle(this.pointStyle);
+  
+    this.source.addFeature(addMarkerFeature);
+  }
+  
+
+}
+// findPath(){ 
+//   this.http.get("https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf624837d0d92fba7048cd85a8893a7148bfdb&start=72.508511,23.027203&end=70.801009,21.973743").subscribe((data)=>{
+//     const format = new this.ol.format.GeoJSON();
+//     const features = format.readFeatures(data, {featureProjection: 'EPSG:3857' });
+//     this.source.addFeatures(features);
+//   }, error => {
+//     console.error('Error fetching route data:', error);
+//   });
+//   this.map.addLayer(this.vector);
+// }
