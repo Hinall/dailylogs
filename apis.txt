@@ -5687,3 +5687,32 @@ addMarker(geo_coords){
   }
 }
 ✔inital code for direction componenet(not working)
+_________________________________________________________________9/7/24
+
+						sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+										''[]''),''responseMessage'',''ok'')::text as data
+										FROM (
+											SELECT  
+											p.parent_layer_id,
+											p.parent_layer_name,
+											p.status,
+
+											(array_to_json(array( select json_build_object(
+														''id'',lm.id,
+														''layer_name'',lm.layer_name,
+														''visible'',lm.visible,
+														''table_name'',lm.table_name,
+														''layer_id'',lm.layer_id,
+														''geometry_type'',lm.geometry_type,
+														''service_url'',lm.service_url,
+														''mobile_service_url'',lm.mobile_service_url,
+														''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master pm WHERE pm.parent_layer_id = lm.parent_layer),
+														''is_combined_service'',lm.is_combined_service,
+														''is_info_popup'',lm.is_info_popup,
+														''is_attribute_info'',lm.is_attribute_info,
+														''defination'',lm.defination 
+														) FROM public.tbl_web_layer_master AS lm WHERE lm.status is true and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+											))) AS child_layer
+
+										from public.tbl_parent_layer_master p WHERE p.status is true and p.parent_layer_name in (''Public Service'' , ''Property'', ''Health'' , ''New Projects'' , ''City Amenities'' , ''Education Department'' , ''Health Department'' , ''Layers'',''Classified Satellite Image'',''Satellite Image'',''Elevation Model'',''Disaster Management'',''Assessment Department'') order by p.parent_layer_id)data1;';
+	 >>make it work
