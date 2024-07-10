@@ -5715,4 +5715,2403 @@ _________________________________________________________________9/7/24
 											))) AS child_layer
 
 										from public.tbl_parent_layer_master p WHERE p.status is true and p.parent_layer_name in (''Public Service'' , ''Property'', ''Health'' , ''New Projects'' , ''City Amenities'' , ''Education Department'' , ''Health Department'' , ''Layers'',''Classified Satellite Image'',''Satellite Image'',''Elevation Model'',''Disaster Management'',''Assessment Department'') order by p.parent_layer_id)data1;';
-	 >>make it work
+	 >>make it 
+_________________________________________________________________________________________________________________________10/7/24
+
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+								''[]''),''responseMessage'',''ok'')::text as data
+								FROM (
+									SELECT  
+									p.parent_layer_id,
+									p.parent_layer_name,
+									p.status,
+
+									(array_to_json(array( select json_build_object(
+												''id'',lm.id,
+												''layer_name'',lm.layer_name,
+												''visible'',lm.visible,
+												''table_name'',lm.table_name,
+												''layer_id'',lm.layer_id,
+												''geometry_type'',lm.geometry_type,
+												''service_url'',lm.service_url,
+												''mobile_service_url'',lm.mobile_service_url,
+												''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master pm WHERE pm.parent_layer_id = lm.parent_layer),
+												''is_combined_service'',lm.is_combined_service,
+												''is_info_popup'',lm.is_info_popup,
+												''is_attribute_info'',lm.is_attribute_info,
+												''defination'',lm.defination 
+												) FROM public.tbl_web_layer_master AS lm WHERE lm.status is true and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+									))) AS child_layer
+
+								from public.tbl_parent_layer_master p WHERE p.status is true 
+								order by p.parent_layer_id)data1;';
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------✔ sp working for 3d
+
+-- FUNCTION: public.fn_web_get_all_layer_image(text)
+
+-- DROP FUNCTION public.fn_web_get_all_layer_image(text);
+
+CREATE OR REPLACE FUNCTION public.fn_web_get_all_layer_image(
+	userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+		sql_query text;
+		userJsonObject JSON;
+		_page_name TEXT DEFAULT '';
+		_state_id text;
+		
+		
+	BEGIN
+			
+			-- SELECT fn_web_get_all_layer_image('{"page_name":"3D","state_id":"1"}');
+			-- SELECT fn_web_get_all_layer_image('{"page_name":"3D" }');			
+			-- SELECT layer_seq,* from public.tbl_web_layer_master where geometry_type = 'Image'
+			-- SELECT * from tbl_parent_layer_master where state_id = 1
+			-- select * from tbl_web_layer_master where geometry_type = '3D'
+			-- SELECT * from tbl_error_log order by created_on desc limit 10
+			
+			userJsonObject := cast(userjson AS JSON) :: JSON;
+			_page_name := userJsonObject ->> 'page_name';
+			_state_id 	:= userJsonObject ->> 'state_id';
+			
+			IF _page_name = 'dashboard' THEN
+			
+				IF _state_id = '' THEN
+
+						sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+										''[]''),''responseMessage'',''ok'')::text as data
+						missing FROM-clause entry for table "p":fn_web_get_all_layer_image				FROM (
+											SELECT  
+											p.parent_layer_id,
+											p.parent_layer_name,
+											p.status,
+
+											(array_to_json(array( select json_build_object(
+														''id'',lm.id,
+														''layer_name'',lm.layer_name,
+														''visible'',lm.visible,
+														''table_name'',lm.table_name,
+														''layer_id'',lm.layer_id,
+														''geometry_type'',lm.geometry_type,
+														''service_url'',lm.service_url,
+														''mobile_service_url'',lm.mobile_service_url,
+														''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master pm WHERE pm.parent_layer_id = lm.parent_layer),
+														''is_combined_service'',lm.is_combined_service,
+														''is_info_popup'',lm.is_info_popup,
+														''is_attribute_info'',lm.is_attribute_info,
+														''defination'',lm.defination 
+														) FROM public.tbl_web_layer_master AS lm WHERE lm.status is true and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+											))) AS child_layer
+
+										from public.tbl_parent_layer_master p WHERE p.status is true and p.parent_layer_name in (''Public Service'' , ''Property'', ''Health'' , ''New Projects'' , ''City Amenities'' , ''Education Department'' , ''Health Department'' , ''Layers'',''Classified Satellite Image'',''Satellite Image'',''Elevation Model'',''Disaster Management'',''Assessment Department'') order by p.parent_layer_id)data1;';
+				ELSE 
+				
+						sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+										''[]''),''responseMessage'',''ok'')::text as data
+										FROM (
+											SELECT  
+											p.parent_layer_id,
+											p.parent_layer_name,
+											p.status,
+											p.state_id,
+											(array_to_json(array( select json_build_object(
+														''id'',lm.id,
+														''layer_name'',lm.layer_name,
+														''visible'',lm.visible,
+														''table_name'',lm.table_name,
+														''layer_id'',lm.layer_id,
+														''geometry_type'',lm.geometry_type,
+														''service_url'',lm.service_url,
+														''mobile_service_url'',lm.mobile_service_url,
+														''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master pm WHERE pm.parent_layer_id = lm.parent_layer),
+														''is_combined_service'',lm.is_combined_service,
+														''is_info_popup'',lm.is_info_popup,
+														''is_attribute_info'',lm.is_attribute_info,
+														''defination'',lm.defination 
+														) FROM public.tbl_web_layer_master AS lm WHERE lm.status is true and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+											))) AS child_layer
+
+										from public.tbl_parent_layer_master p WHERE p.status is true and p.state_id = '|| _state_id ||'::integer
+										and p.parent_layer_name in (''Public Service'' , ''Property'', ''Health'' , ''New Projects'' , ''City Amenities'' , ''Education Department'' , ''Health Department'' , ''Layers'',''Classified Satellite Image'',''Satellite Image'',''Elevation Model'',''Disaster Management'',''Assessment Department'') order by p.parent_layer_id)data1;';
+				END IF;
+
+				
+			ELSEIF _page_name = 'surveydetail' THEN
+		
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+								''[]''),''responseMessage'',''ok'')::text as data
+								FROM (
+									SELECT  
+									p.parent_layer_id,
+									p.parent_layer_name,
+									p.status,
+
+									(array_to_json(array( select json_build_object(
+												''id'',lm.id,
+												''layer_name'',lm.layer_name,
+												''visible'',lm.visible,
+												''table_name'',lm.table_name,
+												''layer_id'',lm.layer_id,
+												''geometry_type'',lm.geometry_type,
+												''service_url'',lm.service_url,
+												''mobile_service_url'',lm.mobile_service_url,
+												''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master pm WHERE pm.parent_layer_id = lm.parent_layer),
+												''is_combined_service'',lm.is_combined_service,
+												''is_info_popup'',lm.is_info_popup,
+												''is_attribute_info'',lm.is_attribute_info,
+												''defination'',lm.defination 
+												) FROM public.tbl_web_layer_master AS lm WHERE lm.status is true and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+									))) AS child_layer
+
+								from public.tbl_parent_layer_master p WHERE p.status is true and p.parent_layer_name in (''Layers'',''Classified Satellite Image'',''Satellite Image'',''Elevation Model'',''DP department layers'',''Disaster Management'',''Assessment Department'') order by p.parent_layer_id)data1;';
+				
+				
+			ELSEIF _page_name = '3D' THEN
+					RAISE NOTICE'3d';
+			
+		sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+								''[]''),''responseMessage'',''ok'')::text as data
+								FROM (
+									SELECT  
+									p.parent_layer_id,
+									p.parent_layer_name,
+									p.status,
+
+									(array_to_json(array( select json_build_object(
+												''id'',lm.id,
+												''layer_name'',lm.layer_name,
+												''visible'',lm.visible,
+												''table_name'',lm.table_name,
+												''layer_id'',lm.layer_id,
+												''geometry_type'',lm.geometry_type,
+												''service_url'',lm.service_url,
+												''mobile_service_url'',lm.mobile_service_url,
+												''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master p  WHERE p.parent_layer_id = lm.parent_layer),
+												''is_combined_service'',lm.is_combined_service,
+												''is_info_popup'',lm.is_info_popup,
+												''is_attribute_info'',lm.is_attribute_info,
+												''defination'',lm.defination 
+												) FROM public.tbl_web_layer_master AS lm WHERE  lm.geometry_type =''3D''and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+									))) AS child_layer
+
+								from public.tbl_parent_layer_master p WHERE p.parent_layer_id in (select parent_layer from public.tbl_web_layer_master where geometry_type=''3D'') 
+								order by p.parent_layer_id)data1;';
+				
+		ELSE
+				
+				sql_query := 'SELECT json_build_object(''responseCode'',200,''data'',COALESCE(to_json(array_agg(data1)), 
+								''[]''),''responseMessage'',''ok'')::text as data
+								FROM (
+									SELECT  
+									p.parent_layer_id,
+									p.parent_layer_name,
+									p.status,
+
+									(array_to_json(array( select json_build_object(
+												''id'',lm.id,
+												''layer_name'',lm.layer_name,
+												''visible'',lm.visible,
+												''table_name'',lm.table_name,
+												''layer_id'',lm.layer_id,
+												''geometry_type'',lm.geometry_type,
+												''service_url'',lm.service_url,
+												''mobile_service_url'',lm.mobile_service_url,
+												''parent_layer'',(select parent_layer_name from public.tbl_parent_layer_master p  WHERE p.parent_layer_id = lm.parent_layer),
+												''is_combined_service'',lm.is_combined_service,
+												''is_info_popup'',lm.is_info_popup,
+												''is_attribute_info'',lm.is_attribute_info,
+												''defination'',lm.defination 
+												) FROM public.tbl_web_layer_master AS lm WHERE lm.status is true and lm.parent_layer = p.parent_layer_id order by lm.layer_seq desc
+									))) AS child_layer
+
+								from public.tbl_parent_layer_master p WHERE p.status is true 
+								order by p.parent_layer_id)data1;';
+				
+				
+			
+			END IF;
+			RETURN QUERY EXECUTE sql_query;
+			RAISE NOTICE '%' , sql_query;
+		
+		
+			EXCEPTION WHEN OTHERS 
+			THEN
+				DECLARE p_errormessage VARCHAR(4000);
+				DECLARE p_errorstate VARCHAR(4000);
+				DECLARE p_errorline VARCHAR(4000);
+
+				BEGIN									
+					p_errormessage:= SQLERRM;
+					p_errorstate:= SQLSTATE;
+					GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+					INSERT INTO public.tbl_error_log(error_name,error_callstack,error_method,created_on)		
+					SELECT p_errorline,p_errormessage||':fn_web_get_all_layer_image',p_errorstate,timezone('Asia/Kolkata'::text, now());
+
+				END;
+				sql_query := 'SELECT json_build_object(''responseCode'',201,''responseMessage'',''failed'')::text as data';
+				RETURN QUERY EXECUTE sql_query;
+	END;
+$BODY$;
+
+ALTER FUNCTION public.fn_web_get_all_layer_image(text)
+    OWNER TO postgres;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------@3d module back up
+import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
+import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { Viewer } from 'cesium';
+import * as Cesium from 'cesium';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { trigger, transition, style, animate, state } from '@angular/animations';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CommonsService } from 'src/app/services/commons.service';
+import * as turf from '@turf/turf';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import * as glob from '../../../environments/environment';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import html2canvas from 'html2canvas';
+import { LabelModule } from '@progress/kendo-angular-label';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { TreeViewModule } from '@progress/kendo-angular-treeview';
+import { GridModule, ExcelModule, PDFModule } from '@progress/kendo-angular-grid';
+import { DialogModule } from '@progress/kendo-angular-dialog';
+import { WorkbookSheet, ExcelExportData } from '@progress/kendo-angular-excel-export';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+
+
+interface Food {
+  value: string;
+  viewValue: string;
+}
+
+@Component({
+  selector: 'app-3d',
+  standalone: true,
+  //imports: [SharedModule],
+  templateUrl: './3d.component.html',
+  styleUrls: ['./3d.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  imports: [LabelModule, DropDownsModule, TreeViewModule, DialogModule, DateInputsModule, RouterOutlet, CommonModule, MatInputModule, MatSelectModule, MatButtonToggleModule, MatIconModule, MatSlideToggleModule, ReactiveFormsModule, MatButtonModule, MatMenuModule, MatFormFieldModule],
+  animations: [
+    trigger('widthGrow', [
+      state('closed', style({
+        height: 0,
+      })),
+      state('open', style({
+        height: 500
+      })),
+      transition('* => *', animate(900))
+    ]),
+  ]
+  //template: '<div appCesium></div>'
+})
+
+export default class _3D implements OnInit {
+  data: any[] = [];
+  bimdata: any[] = [];
+  viewer: any;
+  current_image: any;
+  imageryLayers: any;
+  map_3d_data = new Array();
+  dropDownData: any;
+  drawingMode: any = "line";
+  activeShapePoints: any[] = [];
+  activeShape: any;
+  floatingPoint: any;
+  handler: any;
+  LineMeasurementhandler: any;
+  infoClickHandler: any;
+  geoJson: any;
+  points: any[] = [];
+  lineGraphics;
+  labelEntities: any[] = [];
+  dblClick = false;
+  measureEnabled = false;
+  polygonMeasureEnabled = false;
+  info_click = false;
+  goto_click = false;
+  property_data: any;
+  add_bim_data_click = false;
+  pointmodelEntity: any;
+  modelEntity: any;
+
+  loadSatelliteImg: false;
+
+  private url = glob.environment.baseUrl;
+
+  galleryImg: any = "Satellite Map";
+
+  formSubmitted = false;
+
+  propertyDataInfohandler: any;
+  propertyDataInfo_click = false;
+
+  gridarr: any[] = [];
+  gridInfoKeys: any;
+
+  silhouetteGreen: any = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+  silhouetteBlue: any = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+
+  selected: any = {
+    feature: undefined,
+    originalColor: new Cesium.Color(),
+  };
+
+  highlighted: any = {
+    feature: undefined,
+    originalColor: new Cesium.Color(),
+  };
+
+  selectedEntity: any = new Cesium.Entity();
+
+  state = "closed";
+  addBimDataHandler: any;
+
+  latitude: any;
+  longitude: any;
+  bimDataForm: FormGroup;
+  DataFormDetail: FormGroup;
+  show: boolean = false;
+  public editDialog: any = false;
+  public layerDetailDialog: any = false;
+  feature_name: any;
+  selectFeatureDialog: any = false;
+
+  gotopoint: any = null;
+  cctv_entity: any[] = [];
+
+  flag_details: any = null;
+
+
+  constructor(private http: HttpClient,
+    private commonService: CommonsService,
+  ) { }
+
+  ngOnInit() {
+
+    this.bimDataForm = new FormGroup({
+      feature_name: new FormControl()
+    });
+
+    this.DataFormDetail = new FormGroup({
+      cctv_asset_id: new FormControl(),
+      location_name: new FormControl(),
+      junction_type: new FormControl(),
+      pstation_name: new FormControl()
+    })
+
+    this.initializeViewer();
+
+    this.get_layer_panel_data("3D", "");
+
+    var canvas = document.createElement('div');
+
+    this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+
+    this.LineMeasurementhandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+    
+
+    this.addBimDataHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+
+    this.propertyDataInfohandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+
+    this.silhouetteGreen.uniforms.color = Cesium.Color.LIME;
+    this.silhouetteGreen.uniforms.length = 0.01;
+    this.silhouetteGreen.selected = [];
+
+    this.silhouetteBlue.uniforms.color = Cesium.Color.BLUE;
+    this.silhouetteBlue.uniforms.length = 0.01;
+    this.silhouetteBlue.selected = [];
+
+
+    this.viewer.scene.postProcessStages.add(
+      Cesium.PostProcessStageLibrary.createSilhouetteStage([
+        this.silhouetteBlue,
+        this.silhouetteGreen,
+      ])
+    );
+
+    this.imageryLayers = this.viewer.imageryLayers; 
+
+  }
+
+
+  reactiveForm = new FormGroup({
+    layer_name: new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(250)]),
+    table_name: new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(250)]),
+    layer_id: new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(250)]),
+    layer_type: new FormControl('', [Validators.required]),
+    parent_layer: new FormControl('', [Validators.required]),
+    service_url: new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(1000)]),
+    geometry_type: new FormControl('', [Validators.required]),
+    scale_start: new FormControl('', [Validators.required]),
+    scale_end: new FormControl('', [Validators.required]),
+    status: new FormControl(),
+    z_index: new FormControl(),
+    wms: new FormControl(),
+    info_click: new FormControl(),
+    first_time: new FormControl()
+  });
+
+
+  public validate(): void {
+    if (this.reactiveForm.invalid) {
+      for (const control of Object.keys(this.reactiveForm.controls)) {
+        this.reactiveForm.controls[control].markAsTouched();
+      }
+      return;
+    }
+    else {
+
+      var wmsElement = <HTMLInputElement>document.getElementById("wms");
+      var statusElement = <HTMLInputElement>document.getElementById("status");
+      var info_clickElement = <HTMLInputElement>document.getElementById("info_click");
+      var first_timeElement = <HTMLInputElement>document.getElementById("first_time");
+
+      var form_data = {
+        flag: "insert",
+        layer_name: this.reactiveForm.controls.layer_name.value,
+        table_name: this.reactiveForm.controls.table_name.value,
+        layer_id: this.reactiveForm.controls.layer_id.value,
+        layer_type: this.reactiveForm.controls.layer_type.value,
+        parent_layer: this.reactiveForm.controls.parent_layer.value,
+        service_url: this.reactiveForm.controls.service_url.value,
+        geometry_type: this.reactiveForm.controls.geometry_type.value,
+        scale_start: this.reactiveForm.controls.scale_start.value,
+        scale_end: this.reactiveForm.controls.scale_end.value,
+        wms: wmsElement.checked,
+        status: statusElement.checked,
+        is_info_click: info_clickElement.checked,
+        z_index: this.reactiveForm.controls.z_index.value,
+        is_first_time_load: first_timeElement.checked
+      }
+
+      this.commonService.crudLayerManagement(form_data).subscribe((data: any) => {
+        console.log(data);
+      });
+    }
+  }
+
+  toggleCollapse(parentLayerId: number) {
+    const collapseId = 'panelsStayOpen-collapse' + parentLayerId;
+    const collapseElement = document.getElementById(collapseId);
+    if (collapseElement) {
+      collapseElement.classList.toggle('show');
+    }
+  }
+
+  addLayerDetails() {
+    this.formSubmitted = true;
+    if (this.reactiveForm.valid) {
+      return;
+    }
+  }
+
+  public closeEditDialog() {
+    this.editDialog = false;
+    this.DataFormDetail.reset();
+  }
+
+  public openEditDialog() {
+    this.editDialog = true;
+  }
+
+  public openLayerDetailDialog() {
+    this.layerDetailDialog = true;
+
+    /** Below Commented Code is to get all 3d data from db and add 3d object to map */
+    // var form_data = {
+    //   flag: "fetch"
+    // }
+
+    // this.commonService.crudBimData(form_data).subscribe((data: any) => {
+    //   this.bimdata = data.data;    
+
+    //   for(var i=0; i< this.bimdata.length; i++){
+    //     this.add_data_on_click(this.bimdata[i].longitude , this.bimdata[i].latitude , "get" , this.bimdata[i] , "cctv");
+    //   }
+
+    // });
+
+
+  }
+
+  public closeLayerDetailDialog() {
+    this.formSubmitted = false;
+    this.reactiveForm.reset();
+    this.layerDetailDialog = false;
+  }
+
+  get_layer_by_state_id(event) {
+
+
+    var state_id = event.value;
+
+    this.get_layer_panel_data("3D", state_id);
+
+  }
+
+  showHideData(event) {
+    var service_url = event.target.getAttribute("service-url");
+    var mobile_service_url = event.target.getAttribute("mobile_service_url")
+    var is_combined_service = event.target.getAttribute("combined_service");
+    var parent_layer = event.target.getAttribute("parent_layer");
+    var table_name = event.target.getAttribute("value");
+    var flag_status = event.target.getAttribute("_id");
+    var imageryLayers = this.viewer.imageryLayers;
+
+    if (event.target.checked == true) {
+
+    var form_data = {
+      flag: "fetch"
+    }
+
+    this.http.post("https://apagri.infinium.management/midcgis/layer/crud_cctv_location", form_data).subscribe((data: any) => {
+      this.bimdata = data.data;    
+
+      for(var i=0; i< this.bimdata.length; i++){
+        this.add_data_on_click(this.bimdata[i].longitude , this.bimdata[i].latitude , "get" , this.bimdata[i] , table_name);
+      }
+
+    });
+
+    }
+    else {
+
+      for(var i=0; i<this.cctv_entity.length; i++){
+      this.viewer.entities.remove(this.cctv_entity[i]);
+      }
+
+
+    }
+  }
+
+
+  get_layer_panel_data(pageName, stateId) {
+    this.data = [];
+    var formData = {
+      flag: "fetch_all",
+      layer_type: "3D"
+    }
+
+    this.commonService.getLayerAndImagePanel(formData).subscribe((data: any) => {
+      this.data = data.data;
+
+    });
+
+
+  }
+
+
+  async add_remove_3d_data_new(assest_id, flag) {
+    if (flag) {
+      var tileurl = "https://re-gis.mcgm.gov.in:9443/data/" + assest_id + "/tileset.json";
+      var _3dTileSet = await Cesium.Cesium3DTileset.fromUrl(tileurl); //2409626 //2411758
+      this.viewer.scene.primitives.add(_3dTileSet);
+      this.viewer.flyTo(_3dTileSet);
+      this.map_3d_data.push(_3dTileSet);
+      this.map_3d_data[assest_id] = _3dTileSet;
+    } else {
+      this.map_3d_data[assest_id].show = false;
+    }
+  }
+
+
+  /* Measurement Starts */
+  createPoint(worldPosition) {
+    const point = this.viewer.entities.add({
+      position: worldPosition,
+      point: {
+        color: Cesium.Color.RED,
+        pixelSize: 5,
+        //heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      },
+    });
+    return point;
+  }
+
+  drawShape(positionData) {
+    let shape;
+    if (this.drawingMode === "polygon") {
+      shape = this.viewer.entities.add({
+        polygon: {
+          hierarchy: positionData,
+          material: new Cesium.ColorMaterialProperty(
+            Cesium.Color.WHITE.withAlpha(0.7)
+          ),
+        },
+      });
+    }
+    return shape;
+  }
+
+  clearAllMeasurementData() {
+    this.property_data = null;
+    this.viewer.entities.removeAll();
+    this.add_bim_data_click = false;
+    this.propertyDataInfo_click = false;
+    this.goto_click = false;
+    this.info_click = false;
+    this.measureEnabled = false;
+    this.polygonMeasureEnabled = false;
+  }
+
+  clearMeasurements() {
+    this.points = [];
+    if (Cesium.defined(this.lineGraphics)) {
+      this.viewer.entities.remove(this.lineGraphics);
+    }
+    for (var i = 0; i < this.labelEntities.length; i++) {
+      this.viewer.entities.remove(this.labelEntities[i]);
+    }
+    this.labelEntities = [];
+  }
+
+
+  measurementType(event) {
+
+    if (event.currentTarget.title == "Measure polyline") {
+
+      this.measureEnabled = !this.measureEnabled;
+      this.goto_click = false;
+      this.polygonMeasureEnabled = false;
+      this.info_click = false;
+      this.add_bim_data_click = false;
+
+      this.clearMeasurements();
+
+      if (this.measureEnabled) {
+
+        this.clearMeasurements();
+
+        this.LineMeasurementhandler.setInputAction((click) => {
+
+          if (!this.measureEnabled) {
+            return;
+          }
+
+          if (this.dblClick == true) {
+            this.points = [];
+            this.clearMeasurements();
+          }
+          this.dblClick = false;
+
+          var ray = this.viewer.camera.getPickRay(click.position);
+          var cartesian = this.viewer.scene.pickPosition(click.position);
+
+          if (Cesium.defined(cartesian)) {
+            if (this.points.length === 0) {
+              this.points.push(cartesian);
+            } else {
+              this.points.push(cartesian);
+              this.drawLines();
+            }
+          }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        this.LineMeasurementhandler.setInputAction((click) => {
+          var ray = this.viewer.camera.getPickRay(click.position);
+          var cartesian = this.viewer.scene.pickPosition(click.position);
+
+          if (Cesium.defined(cartesian) && this.points.length > 1) {
+            var totalDistance = 0;
+            for (var i = 0; i < this.points.length - 1; i++) {
+              totalDistance += Cesium.Cartesian3.distance(this.points[i], this.points[i + 1]);
+            }
+
+            console.log('Total distance between all points: ' + totalDistance.toFixed(2) + ' meters');
+
+            var midpoint = Cesium.Cartesian3.lerp(this.points[i - 1], this.points[i], 0.5, new Cesium.Cartesian3());
+
+            var entity = this.viewer.entities.add({
+              position: midpoint,
+              // point : {
+              //     pixelSize : 10,
+              //     color : Cesium.Color.YELLOW
+              // },
+              label: {
+                showBackground: true,
+                text: totalDistance.toFixed(2) + ' meters',
+                backgroundColor: Cesium.Color.BLACK,
+                border: 1
+
+              }
+            });
+
+            this.labelEntities.push(entity);
+
+            // var labelEntity = this.viewer.entities.add({
+            //   position: midpoint,
+            //   label: {
+            //     text: totalDistance.toFixed(2) + ' meters',
+            //     font: '12px sans-serif',
+            //     fillColor: Cesium.Color.BLACK,
+            //     outlineColor: Cesium.Color.BLACK,
+            //     outlineWidth: 0.5,
+            //     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            //   }
+            // });
+            // this.labelEntities.push(labelEntity);
+
+            this.dblClick = true;
+          }
+        }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+      }
+    }
+    else {
+
+      this.polygonMeasureEnabled = !this.polygonMeasureEnabled;
+
+      this.measureEnabled = false;
+      this.goto_click = false;
+      this.info_click = false;
+      this.add_bim_data_click = false;
+
+      this.viewer.entities.removeAll();
+
+      this.drawingMode = "polygon";
+
+      this.handler.setInputAction((event) => {
+
+        if (!this.polygonMeasureEnabled) {
+          return;
+        }
+
+        const ray = this.viewer.camera.getPickRay(event.position);
+        const earthPosition = this.viewer.scene.globe.pick(ray, this.viewer.scene);
+        if (Cesium.defined(earthPosition)) {
+          if (this.activeShapePoints.length === 0) {
+            this.floatingPoint = this.createPoint(earthPosition);
+            this.activeShapePoints.push(earthPosition);
+            const dynamicPositions = new Cesium.CallbackProperty(() => {
+              if (this.drawingMode === "polygon") {
+                return new Cesium.PolygonHierarchy(this.activeShapePoints);
+              }
+              return this.activeShapePoints;
+            }, false);
+            this.activeShape = this.drawShape(dynamicPositions);
+          }
+          this.activeShapePoints.push(earthPosition);
+          this.createPoint(earthPosition);
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+      this.handler.setInputAction((event) => {
+        if (Cesium.defined(this.floatingPoint)) {
+          const ray = this.viewer.camera.getPickRay(event.endPosition);
+          const newPosition = this.viewer.scene.globe.pick(ray, this.viewer.scene);
+          if (Cesium.defined(newPosition)) {
+            this.floatingPoint.position.setValue(newPosition);
+            this.activeShapePoints.pop();
+            this.activeShapePoints.push(newPosition);
+          }
+        }
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+      this.handler.setInputAction((event) => {
+        if (this.drawingMode === "polygon" && this.activeShapePoints.length > 2) {
+
+          this.geoJson = null;
+          this.geoJson = this.getGeoJsonFromPolygon(this.activeShapePoints);
+          this.geoJson.features[0].geometry.coordinates[0].splice(this.geoJson.features[0].geometry.coordinates[0].length - 1, 1);
+          this.geoJson.features[0].geometry.coordinates[0].push(this.geoJson.features[0].geometry.coordinates[0][0]);
+          const area = turf.area(this.geoJson);
+          console.log(area);
+          this.terminateShape();
+
+          var cartesian = this.viewer.scene.pickPosition(event.position);
+
+          var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+          var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+          var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+
+          var entity = this.viewer.entities.add({
+            position: cartesian,
+            label: {
+              pixelSize: 1,
+              showBackground: true,
+              text: area.toFixed(2) + ' sq.m\^2',
+              backgroundColor: Cesium.Color.BLACK,
+              border: 1
+
+            },
+          });
+
+
+        }
+      }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+
+    }
+
+
+  }
+
+  getFeature() {
+    this.selectFeatureDialog = false;
+    this.editDialog = true;
+    this.flag_details = 'create'
+  }
+
+  UpdateFeature(){
+    this.editDialog = true;
+    this.flag_details = 'update'
+  }
+
+  closeFeatureDialog() {
+    this.selectFeatureDialog = false;
+  }
+
+  add_bim_data(event) {
+
+    this.feature_name = event.target.value;
+    this.selectFeatureDialog = true;
+
+    this.add_bim_data_click = !this.add_bim_data_click;
+    this.measureEnabled = false;
+    this.goto_click = false;
+    this.polygonMeasureEnabled = false;
+    this.info_click = false;
+
+    this.addBimDataHandler.setInputAction((click) => {
+
+      if (this.add_bim_data_click == false) {
+        return;
+      }
+      else {
+
+        var cartesian = this.viewer.scene.pickPosition(click.position);
+
+
+        var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+        console.log(
+          'lon ' + Cesium.Math.toDegrees(cartographic.longitude) + ', ' +
+          'lat ' + Cesium.Math.toDegrees(cartographic.latitude) + ', ' +
+          'alt ' + cartographic.height);
+
+        this.add_data_on_click(Cesium.Math.toDegrees(cartographic.longitude), Cesium.Math.toDegrees(cartographic.latitude), "create", "", event.target.value);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  }
+
+  add_data_on_click(long, lat, type, response, Featuretype) {
+    if (type == "create") {
+
+      this.latitude = lat;
+      this.longitude = long;
+
+      console.log("Lat = ", this.latitude);
+
+      if (Featuretype == "car") {
+
+        this.modelEntity = this.viewer.entities.add({
+          name: "milktruck",
+          position: Cesium.Cartesian3.fromDegrees(long, lat),
+          model: {
+            uri:
+              "../../../assets/3d_data/CesiumMilkTruck.glb",
+            minimumPixelSize: 30,
+            // maximumScale: 20000,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+          },
+
+        });
+
+        const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+          this.modelEntity.position.getValue(this.viewer.clock.currentTime),
+          new Cesium.HeadingPitchRoll(0, 0, 0)
+        );
+
+        this.modelEntity.orientation = initialOrientation;
+
+        return;
+
+      }
+      if (Featuretype == "street_light") {
+
+        this.modelEntity = this.viewer.entities.add({
+          name: "milktruck",
+          position: Cesium.Cartesian3.fromDegrees(long, lat),
+          model: {
+            uri:
+              "../../../assets/3d_data/dividerStreetLight.glb",
+            minimumPixelSize: 30,
+            // maximumScale: 20000,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+          },
+
+        });
+
+        const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+          this.modelEntity.position.getValue(this.viewer.clock.currentTime),
+          new Cesium.HeadingPitchRoll(0, 0, 0)
+        );
+
+        this.modelEntity.orientation = initialOrientation;
+
+        return;
+
+      }
+      if (Featuretype == "cctv") {
+
+        this.modelEntity = this.viewer.entities.add({
+          name: "milktruck",
+          position: Cesium.Cartesian3.fromDegrees(long, lat),
+          model: {
+            uri:
+              "../../../assets/3d_data/cctv.glb",
+            minimumPixelSize: 30,
+            // maximumScale: 20000,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+          },
+
+
+        });
+
+        const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+          this.modelEntity.position.getValue(this.viewer.clock.currentTime),
+          new Cesium.HeadingPitchRoll(0, 0, 0)
+        );
+
+        this.modelEntity.orientation = initialOrientation;
+
+        return;
+
+      }
+
+      if (Featuretype == "smart_pole") {
+
+        this.modelEntity = this.viewer.entities.add({
+          name: "milktruck",
+          position: Cesium.Cartesian3.fromDegrees(long, lat),
+          model: {
+            uri:
+              "../../../assets/3d_data/smart_pole.glb",
+            minimumPixelSize: 30,
+            // maximumScale: 20000,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+          },
+
+        });
+
+        const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+          this.modelEntity.position.getValue(this.viewer.clock.currentTime),
+          new Cesium.HeadingPitchRoll(0, 0, 0)
+        );
+
+        this.modelEntity.orientation = initialOrientation;
+
+        return;
+
+      }
+
+    }
+    else {
+
+      // if (Featuretype == "car") {
+
+      //   let modelEntity = this.viewer.entities.add({
+      //     name: "milktruck",
+      //     position: Cesium.Cartesian3.fromDegrees(long, lat),
+      //     model: {
+      //       uri:
+      //         "../../../assets/3d_data/CesiumMilkTruck.glb",
+      //       minimumPixelSize: 30,
+      //       // maximumScale: 20000,
+      //       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+      //     },
+
+      //   });
+
+      //   const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+      //     modelEntity.position.getValue(this.viewer.clock.currentTime),
+      //     new Cesium.HeadingPitchRoll(0, 0, 0)
+      //   );
+
+      //   modelEntity.orientation = initialOrientation;
+
+      //   if (response.orientation != null) {
+      //     var result = JSON.parse(response.orientation);
+
+      //     modelEntity.orientation._value.w = result.w
+      //     modelEntity.orientation._value.x = result.x
+      //     modelEntity.orientation._value.y = result.y
+      //     modelEntity.orientation._value.z = result.z
+      //   }
+
+      //   return;
+
+      // }
+
+      // if (Featuretype == "street_light") {
+
+      //   let modelEntity = this.viewer.entities.add({
+      //     name: "milktruck",
+      //     position: Cesium.Cartesian3.fromDegrees(long, lat),
+      //     model: {
+      //       uri:
+      //         "../../../assets/3d_data/dividerStreetLight.glb",
+      //       minimumPixelSize: 30,
+      //       // maximumScale: 20000,
+      //       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+      //     },
+
+      //   });
+
+      //   const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+      //     modelEntity.position.getValue(this.viewer.clock.currentTime),
+      //     new Cesium.HeadingPitchRoll(0, 0, 0)
+      //   );
+
+      //   modelEntity.orientation = initialOrientation;
+
+      //   if (response.orientation != null) {
+      //     var result = JSON.parse(response.orientation);
+
+      //     modelEntity.orientation._value.w = result.w
+      //     modelEntity.orientation._value.x = result.x
+      //     modelEntity.orientation._value.y = result.y
+      //     modelEntity.orientation._value.z = result.z
+      //   }
+
+      //   return;
+
+
+      // }
+
+      // if (Featuretype == "cctv") {
+
+      //   var propertyBag = new Cesium.PropertyBag();
+      //   propertyBag.addProperty('cctv_asset_id', response.cctv_asset_id);
+      //   propertyBag.addProperty('cctv_id', response.cctv_id);
+      //   propertyBag.addProperty('junction_type', response.junction_type);
+      //   propertyBag.addProperty('latitude', response.latitude);
+      //   propertyBag.addProperty('location_name', response.location_name);
+      //   propertyBag.addProperty('longitude', response.longitude);
+      //   propertyBag.addProperty('police_station_name', response.police_station_name);
+
+      //   console.log(response);
+
+      //   let modelEntity = this.viewer.entities.add({
+      //     name: "milktruck",
+      //     position: Cesium.Cartesian3.fromDegrees(long, lat),
+      //     model: {
+      //       uri:
+      //         "../../../assets/3d_data/cctv.glb",
+      //       minimumPixelSize: 30,
+      //       // maximumScale: 20000,
+      //       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+      //     },
+      //     properties: propertyBag
+
+      //   });
+
+      //   const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+      //     modelEntity.position.getValue(this.viewer.clock.currentTime),
+      //     new Cesium.HeadingPitchRoll(0, 0, 0)
+      //   );
+
+      //   modelEntity.orientation = initialOrientation;
+
+      //   if (response.orientation != null) {
+      //     var result = JSON.parse(response.orientation);
+
+      //     modelEntity.orientation._value.w = result.w
+      //     modelEntity.orientation._value.x = result.x
+      //     modelEntity.orientation._value.y = result.y
+      //     modelEntity.orientation._value.z = result.z
+      //   }
+
+      //   return;
+
+
+      // }
+
+        var propertyBag = new Cesium.PropertyBag();
+        propertyBag.addProperty('cctv_asset_id', response.cctv_asset_id);
+        propertyBag.addProperty('cctv_id', response.cctv_id);
+        propertyBag.addProperty('junction_type', response.junction_type);
+        propertyBag.addProperty('latitude', response.latitude);
+        propertyBag.addProperty('location_name', response.location_name);
+        propertyBag.addProperty('longitude', response.longitude);
+        propertyBag.addProperty('pstation_name', response.police_station_name);
+
+        console.log(response);
+
+        let modelEntity = this.viewer.entities.add({
+          name: "milktruck",
+          position: Cesium.Cartesian3.fromDegrees(long, lat),
+          model: {
+            uri:
+              "../../../assets/3d_data/" + Featuretype +".glb",
+            minimumPixelSize: 30,
+            // maximumScale: 20000,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+          },
+          properties: propertyBag
+
+        });
+
+        this.cctv_entity.push(modelEntity);
+
+        const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+          modelEntity.position.getValue(this.viewer.clock.currentTime),
+          new Cesium.HeadingPitchRoll(0, 0, 0)
+        );
+
+        modelEntity.orientation = initialOrientation;
+
+        if (response.orientation != null) {
+          var result = JSON.parse(response.orientation);
+
+          modelEntity.orientation._value.w = result.w
+          modelEntity.orientation._value.x = result.x
+          modelEntity.orientation._value.y = result.y
+          modelEntity.orientation._value.z = result.z
+        }
+
+        return;
+
+
+
+
+    }
+
+  }
+
+  rotateEntity(entity, angleDegrees) {
+
+    const angleRadians = Cesium.Math.toRadians(angleDegrees);
+    const rotationQuat = Cesium.Quaternion.fromAxisAngle(
+      new Cesium.Cartesian3(0, 0, 1),
+      angleRadians
+    );
+    const currentOrientation = this.modelEntity.orientation.getValue(this.viewer.clock.currentTime);
+    const newOrientation = Cesium.Quaternion.multiply(currentOrientation, rotationQuat, new Cesium.Quaternion());
+    this.modelEntity.orientation = newOrientation;
+
+    console.log(this.modelEntity.orientation);
+
+  }
+
+  add_bim_data_to_db($event) {
+
+    var form_data;
+    if(this.flag_details == 'create'){
+
+      form_data = {
+
+      cctv_asset_id: this.DataFormDetail.controls['cctv_asset_id'].value,
+      location_name: this.DataFormDetail.controls['location_name'].value,
+      junction_type: this.DataFormDetail.controls['junction_type'].value,
+      police_station_name: this.DataFormDetail.controls['pstation_name'].value,
+      latitude: this.latitude,
+      longitude: this.longitude,
+      orientation: this.modelEntity.orientation._value,
+      flag: "create"
+
+    }
+
+  }
+
+  if(this.flag_details == 'update'){
+
+    form_data = {
+
+      cctv_id: this.gridarr['cctv_id'],
+      cctv_asset_id: this.DataFormDetail.controls['cctv_asset_id'].value,
+      location_name: this.DataFormDetail.controls['location_name'].value,
+      junction_type: this.DataFormDetail.controls['junction_type'].value,
+      police_station_name: this.DataFormDetail.controls['pstation_name'].value,
+      orientation: this.modelEntity.orientation._value,
+      flag: "update"
+
+    }
+
+  }
+
+    this.latitude = null;
+    this.longitude = null;
+
+    console.log(form_data);
+
+    this.commonService.crudBimData(form_data).subscribe((data: any) => {
+      this.bimdata = data.data;
+    });
+    this.DataFormDetail.reset();
+    this.editDialog = false;
+
+  }
+
+  getBimData() {
+
+    var form_data = {
+      flag: "fetch"
+    }
+
+    this.commonService.crudBimData(form_data).subscribe((data: any) => {
+      this.bimdata = data.data;
+
+      for (var i = 0; i < this.bimdata.length; i++) {
+        this.add_data_on_click(this.bimdata[i].longitude, this.bimdata[i].latitude, "get", this.bimdata[i], "car");
+      }
+
+    });
+
+
+
+
+  }
+
+  openPopup() {
+    this.show = !this.show;
+  }
+
+  drawLines() {
+    if (Cesium.defined(this.lineGraphics)) {
+      this.viewer.entities.remove(this.lineGraphics);
+    }
+    for (var i = 0; i < this.labelEntities.length; i++) {
+      this.viewer.entities.remove(this.labelEntities[i]);
+    }
+
+    var linePositions = [];
+    var totalDistance = 0;
+    for (var i = 0; i < this.points.length; i++) {
+      linePositions.push(this.points[i].clone());
+      if (i > 0) {
+        var distance = Cesium.Cartesian3.distance(this.points[i - 1], this.points[i]);
+        totalDistance += distance;
+        var midpoint = Cesium.Cartesian3.lerp(this.points[i - 1], this.points[i], 0.5, new Cesium.Cartesian3());
+        var labelEntity = this.viewer.entities.add({
+          position: midpoint,
+          label: {
+            text: distance.toFixed(2) + ' meters',
+            font: '12px sans-serif',
+            fillColor: Cesium.Color.BLACK,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 0.5,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            //= heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+          }
+        });
+        this.labelEntities.push(labelEntity);
+      }
+    }
+
+    this.lineGraphics = this.viewer.entities.add({
+      polyline: {
+        positions: linePositions,
+        width: 3,
+        material: new Cesium.PolylineOutlineMaterialProperty({
+          color: Cesium.Color.RED,
+          outlineWidth: 2,
+          outlineColor: Cesium.Color.WHITE
+        })
+      }
+    });
+
+  }
+
+  terminateShape() {
+    this.viewer.entities.removeAll();
+    this.activeShapePoints.pop();
+    this.drawShape(this.activeShapePoints);
+    this.viewer.entities.remove(this.floatingPoint);
+    this.viewer.entities.remove(this.activeShape);
+    this.floatingPoint = undefined;
+    this.activeShape = undefined;
+    this.activeShapePoints = [];
+  }
+
+  getGeoJsonFromPolygon(positionData) {
+    const positions = positionData.map(position => {
+      const cartographic = Cesium.Cartographic.fromCartesian(position);
+      return [Cesium.Math.toDegrees(cartographic.longitude), Cesium.Math.toDegrees(cartographic.latitude)];
+    });
+
+
+    const geoJson = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [positions]
+          },
+          "properties": {}
+        }
+      ]
+    }
+
+    return geoJson;
+  }
+
+
+  /* Measurement Ends */
+
+  /** 3D INFO CLICK starts*/
+
+  infoOf3DData() {
+
+    /** BElow Code is to get Info of 3d object plotted by user */
+    this.goto_click = false;
+    this.measureEnabled = false;
+    this.polygonMeasureEnabled = false;
+    this.info_click = false;
+
+    if (this.propertyDataInfo_click == true) {
+      //document.querySelector("#property_tbl").setAttribute("style" , "display: none");
+      this.propertyDataInfo_click = false;
+    }
+    else {
+      this.propertyDataInfo_click = true;
+    }
+
+
+    this.propertyDataInfohandler.setInputAction((movement) => {
+
+      if (!this.propertyDataInfo_click) {
+        return;
+      }
+      else {
+
+        var pickedFeature = this.viewer.scene.pick(movement.position);
+        if (Cesium.defined(pickedFeature.id)) {
+        
+        this.gridInfoKeys =  pickedFeature.id.properties._propertyNames;
+
+        
+          this.modelEntity = pickedFeature.id;
+          // const initialOrientation = Cesium.Transforms.headingPitchRollQuaternion(
+          //   this.modelEntity.id.position.getValue(this.viewer.clock.currentTime),
+          //   new Cesium.HeadingPitchRoll(0, 0, 0)
+          // );
+  
+          // this.modelEntity.orientation = initialOrientation;
+          
+        for(let i=0; i<Object.values(pickedFeature.id.properties._propertyNames).length; i++){
+          var key:any = Object.values(pickedFeature.id.properties._propertyNames)[i];
+
+          this.gridarr[key] = pickedFeature.id.properties[key]._value;       
+          
+          if(key != 'latitude' && key != 'longitude' && key!= 'cctv_id'){
+          this.DataFormDetail.controls[key].setValue(this.gridarr[key]);
+          }
+
+      }
+
+      alert('Clicked');
+      this.flag_details = 'update';
+      console.log(this.gridInfoKeys);
+      console.log(this.gridarr);
+      this.selectFeatureDialog = false;
+      this.editDialog = true;
+    }
+
+      }
+
+
+     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+  }
+
+  /** 3D INFO CLICK ends */
+
+
+  /** INFO CLICK */
+  featureInfo() {
+
+    this.goto_click = false;
+    this.measureEnabled = false;
+    this.polygonMeasureEnabled = false;
+
+    if (this.info_click == true) {
+      //document.querySelector("#property_tbl").setAttribute("style" , "display: none");
+      this.info_click = false;
+    }
+    else {
+      this.info_click = true;
+    }
+
+
+    let infoClickHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+
+    infoClickHandler.setInputAction((movement) => {
+
+      if (!this.info_click) {
+        return;
+      }
+      else {
+
+        this.silhouetteGreen.selected = [];
+        var pickedFeature = this.viewer.scene.pick(movement.position);
+        if (!Cesium.defined(pickedFeature)) {
+
+          return;
+        }
+
+
+        if (this.silhouetteGreen.selected[0] === pickedFeature) {
+          return;
+        }
+
+
+        var highlightedFeature = this.silhouetteBlue.selected[0];
+        if (pickedFeature === highlightedFeature) {
+          this.silhouetteBlue.selected = [];
+        }
+
+
+        this.silhouetteGreen.selected = [pickedFeature];
+
+
+        var featureName = pickedFeature.getProperty("Prabhag");
+
+        this.property_data = [
+          {
+            value: 'Name',
+            field: pickedFeature.getProperty("Name"),
+          },
+          {
+            value: 'UID',
+            field: pickedFeature.getProperty("Prabhag"),
+          },
+          {
+            value: 'Area Sq.m',
+            field: pickedFeature.getProperty("Area_Sq_m"),
+          },
+          {
+            value: 'Height m',
+            field: pickedFeature.getProperty("Height_m"),
+          },
+          {
+            value: 'X',
+            field: pickedFeature.getProperty("X"),
+          },
+          {
+            value: 'Y',
+            field: pickedFeature.getProperty("Y"),
+          },
+          {
+            value: 'FUID',
+            field: pickedFeature.getProperty("FUID"),
+          },
+          {
+            value: 'Ward',
+            field: pickedFeature.getProperty("Ward"),
+          },
+          {
+            value: 'Prabhag',
+            field: pickedFeature.getProperty("Prabhag"),
+          },
+          {
+            value: 'Zone',
+            field: pickedFeature.getProperty("Zone"),
+          },
+          {
+            value: 'Sq Km.',
+            field: pickedFeature.getProperty("Sq_Km"),
+          },
+          {
+            value: 'Height Category',
+            field: pickedFeature.getProperty("B_Category"),
+          }
+
+        ]
+
+      }
+
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+
+  }
+
+
+
+
+  /** Highlight Building */
+
+  per_selection() {
+
+    this.goto_click = false;
+    this.measureEnabled = false;
+    this.info_click = false;
+    this.polygonMeasureEnabled = false;
+
+
+    this.viewer.screenSpaceEventHandler.setInputAction((movement) => {
+
+      let element = document.getElementById("per_selection") as HTMLInputElement;
+      if (!element.checked) {
+        return;
+      }
+      else {
+
+        if (Cesium.defined(this.selected.feature)) {
+          this.selected.feature.color = this.selected.originalColor;
+          this.selected.feature = undefined;
+        }
+
+        var pickedFeature = this.viewer.scene.pick(movement.position);
+        if (!Cesium.defined(pickedFeature)) {
+          //this.clickHandler(movement);
+          return;
+        }
+
+        if (this.selected.feature === pickedFeature) {
+          return;
+        }
+        this.selected.feature = pickedFeature;
+
+        if (pickedFeature === this.highlighted.feature) {
+          Cesium.Color.clone(
+            this.highlighted.originalColor,
+            this.selected.originalColor
+          );
+          this.highlighted.feature = undefined;
+        } else {
+          Cesium.Color.clone(pickedFeature.color, this.selected.originalColor);
+        }
+
+        pickedFeature.color = Cesium.Color.LIME;
+
+      }
+
+
+    },
+      Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  }
+
+  /** Highlight Building */
+
+  /* GOTO */
+
+  goto_location() {
+
+    this.info_click = false;
+    this.measureEnabled = false;
+    this.polygonMeasureEnabled = false;
+
+    if (this.goto_click == true) {
+      if(this.gotopoint != null){
+        this.viewer.entities.remove(this.gotopoint);
+      }
+      this.goto_click = false;
+    }
+    else {
+      this.goto_click = true;
+    }
+
+    let myMouseHandler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+
+    myMouseHandler.setInputAction((e) => {
+
+      if (!this.goto_click) {
+        return;
+      }
+      else {
+
+        if (this.gotopoint != null) {
+          this.viewer.entities.remove(this.gotopoint);
+        }
+
+        var scene = this.viewer.scene;
+        if (scene.mode !== Cesium.SceneMode.MORPHING) {
+          var pickRay = scene.camera.getPickRay(e.position);
+          var cartesian = scene.globe.pick(pickRay, scene);
+
+          if (cartesian) {
+            var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+            var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+            var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+
+            this.viewer.camera.flyTo({
+              destination: Cesium.Cartesian3.fromDegrees(longitude, latitude, 500),
+              orientation: {
+                
+                roll: 0.0,
+              },
+              duration: 3
+            });
+
+            this.gotopoint = this.viewer.entities.add({
+              name: "milktruck",
+              position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
+              model: {
+                uri:
+                  "../../../assets/3d_data/location_mark.glb",
+                minimumPixelSize: 30,
+                // maximumScale: 20000,
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+              },
+    
+            });
+
+          }
+        }
+
+      }
+
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  }
+
+  changeBaseLayer() {
+
+    this.viewer.scene.imageryLayers.removeAll();
+
+    if (this.galleryImg == "Satellite Map") {
+
+      document.getElementById("mat-mdc-slide-toggle-1-label").setAttribute("style", "color: white; font-weight: 500;")
+
+
+      this.galleryImg = "Default Map"
+      const imageryLayer = Cesium.ImageryLayer.fromWorldImagery(null);
+      this.viewer.scene.imageryLayers.add(imageryLayer);
+
+    }
+    else {
+      this.galleryImg = "Satellite Map"
+      document.getElementById("mat-mdc-slide-toggle-1-label").setAttribute("style", "color: black; font-weight: 500;")
+      const imageryLayer = new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+        url: "https://tile.openstreetmap.org/"
+      }));
+      this.viewer.scene.imageryLayers.add(imageryLayer);
+    }
+
+  }
+
+  takeSS() {
+
+    this.viewer.render();
+    var captureElement: any = document.querySelector("#cesiumContainer");
+
+    html2canvas(captureElement, { allowTaint: false, useCORS: true, }).then((canvas) => {
+
+      const imageData = canvas.toDataURL("image/png");
+
+      const link = document.createElement("a");
+      link.setAttribute("download", "Map.png");
+      link.setAttribute("href", imageData);
+      link.click();
+    });
+
+  }
+
+  togglePanel() {
+    document.body.classList.toggle('closed-panel');
+    this.state = (this.state === "closed") ? "open" : "closed";
+  }
+
+
+  initializeViewer() {
+
+    this.viewer = new Cesium.Viewer("cesiumContainer", {
+      baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+        url: "https://tile.openstreetmap.org/"
+      })),
+      fullscreenButton: false,
+      selectionIndicator: false,
+      infoBox: true,
+      animation: false,
+      timeline: false,
+      shadows: false,
+      skyAtmosphere: false,
+      baseLayerPicker: true,
+      geocoder: false,
+    });
+
+
+    this.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(72.730797, 18.891774, 25000),
+      orientation: {
+        heading: Cesium.Math.toRadians(35.0),
+        pitch: Cesium.Math.toRadians(-45.0),
+        roll: 0.0,
+      },
+    });
+
+  }
+
+
+}
+----------------------
+<div id="cesiumContainer"></div>
+<button type="button" (click)="openLayerDetailDialog()">GET CCTV</button>
+
+<kendo-dialog class="custom-dialog handler-dialog" title="Layer Details" *ngIf="layerDetailDialog" [height]="700" [minWidth]="250" [width]="1024" (close)="closeLayerDetailDialog()">
+
+<form [formGroup]="reactiveForm">
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Name:</label>
+      <input type="text" id="name" name="name" formControlName="layer_name" placeholder="Your name" required minlength="1" maxlength="250" class="form-control form-control-sm" [class.is-invalid]="this.reactiveForm.controls.layer_name.invalid && (this.reactiveForm.controls.layer_name.dirty || this.reactiveForm.controls.layer_name.touched)">
+      <div *ngIf="this.reactiveForm.controls.layer_name.invalid && (this.reactiveForm.controls.layer_name.dirty || this.reactiveForm.controls.layer_name.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.layer_name.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.layer_name.errors?.['minlength']">
+          This field must have at least 1 character.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.layer_name.errors?.['maxlength']">
+          This field must have at most 250 characters.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Table Name:</label>
+      <input class="form-control" formControlName="table_name" type="text" value="" required placeholder="Enter Table Name" [class.is-invalid]="this.reactiveForm.controls.table_name.invalid && (this.reactiveForm.controls.table_name.dirty || this.reactiveForm.controls.table_name.touched)">
+      <div *ngIf="this.reactiveForm.controls.table_name.invalid && (this.reactiveForm.controls.table_name.dirty || this.reactiveForm.controls.table_name.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.table_name.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.table_name.errors?.['minlength']">
+          This field must have at least 1 character.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.table_name.errors?.['maxlength']">
+          This field must have at most 250 characters.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Layer Id:</label>
+      <input class="form-control" formControlName="layer_id" type="text" value="" required placeholder="Enter Layer Id" [class.is-invalid]="this.reactiveForm.controls.layer_id.invalid && (this.reactiveForm.controls.layer_id.dirty || this.reactiveForm.controls.layer_id.touched)">
+      <div *ngIf="this.reactiveForm.controls.layer_id.invalid && (this.reactiveForm.controls.layer_id.dirty || this.reactiveForm.controls.layer_id.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.layer_id.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.layer_id.errors?.['minlength']">
+          This field must have at least 1 character.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.layer_id.errors?.['maxlength']">
+          This field must have at most 250 characters.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Layer Type:</label>
+      <select class="form-control" formControlName="layer_type" required [class.is-invalid]="this.reactiveForm.controls.layer_type.invalid && (this.reactiveForm.controls.layer_type.dirty || this.reactiveForm.controls.layer_type.touched)">
+        <option value="">Select</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>      
+      <div *ngIf="this.reactiveForm.controls.layer_type.invalid && (this.reactiveForm.controls.layer_type.dirty || this.reactiveForm.controls.layer_type.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.layer_type.errors?.['required']">
+          This field is required.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Parent Layer Type:</label>
+      <select class="form-control" formControlName="parent_layer" required [class.is-invalid]="this.reactiveForm.controls.parent_layer.invalid && (this.reactiveForm.controls.parent_layer.dirty || this.reactiveForm.controls.parent_layer.touched)">
+        <option value="">Select</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>      
+      <div *ngIf="this.reactiveForm.controls.parent_layer.invalid && (this.reactiveForm.controls.parent_layer.dirty || this.reactiveForm.controls.parent_layer.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.parent_layer.errors?.['required']">
+          This field is required.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Service Url:</label>
+      <input class="form-control" formControlName="service_url" type="text" value="" required placeholder="Enter Layer Id" [class.is-invalid]="this.reactiveForm.controls.service_url.invalid && (this.reactiveForm.controls.service_url.dirty || this.reactiveForm.controls.service_url.touched)">
+      <div *ngIf="this.reactiveForm.controls.service_url.invalid && (this.reactiveForm.controls.service_url.dirty || this.reactiveForm.controls.service_url.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.service_url.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.service_url.errors?.['minlength']">
+          This field must have at least 1 character.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.service_url.errors?.['maxlength']">
+          This field must have at most 250 characters.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Geometry Type:</label>
+      <select class="form-control" formControlName="geometry_type" required [class.is-invalid]="this.reactiveForm.controls.geometry_type.invalid && (this.reactiveForm.controls.geometry_type.dirty || this.reactiveForm.controls.geometry_type.touched)">
+        <option value="">Select</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>      
+      <div *ngIf="this.reactiveForm.controls.geometry_type.invalid && (this.reactiveForm.controls.geometry_type.dirty || this.reactiveForm.controls.geometry_type.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.geometry_type.errors?.['required']">
+          This field is required.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Scale Start:</label>
+      <input pattern="[0-9]*" class="form-control" formControlName="scale_start" type="text" value="" required placeholder="Enter Layer Id" [class.is-invalid]="this.reactiveForm.controls.scale_start.invalid && (this.reactiveForm.controls.scale_start.dirty || this.reactiveForm.controls.scale_start.touched)">
+      <div *ngIf="this.reactiveForm.controls.scale_start.invalid && (this.reactiveForm.controls.scale_start.dirty || this.reactiveForm.controls.scale_start.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.scale_start.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.scale_start.errors?.['pattern']">
+          This field must be a number.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Scale End:</label>
+      <input pattern="[0-9]*" class="form-control" formControlName="scale_end" type="text" value="" required placeholder="Enter Layer Id" [class.is-invalid]="this.reactiveForm.controls.scale_end.invalid && (this.reactiveForm.controls.scale_end.dirty || this.reactiveForm.controls.scale_end.touched)">
+      <div *ngIf="this.reactiveForm.controls.scale_end.invalid && (this.reactiveForm.controls.scale_end.dirty || this.reactiveForm.controls.scale_end.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.scale_end.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.scale_end.errors?.['pattern']">
+          This field must be a number.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mb-2">        
+      <label class="form-check-label">
+        Status:
+      </label>    
+      <input class="form-check-input" formControlName="status" type="checkbox" id="status">
+    </div>
+
+    <div class="col mb-2">        
+      <label class="form-check-label">
+        WMS:
+      </label>    
+      <input class="form-check-input" formControlName="wms" type="checkbox"  id="wms">
+    </div>
+
+    <div class="col mb-2">        
+      <label class="form-check-label">
+        Info Click:
+      </label>    
+      <input class="form-check-input" formControlName="info_click" type="checkbox" id="info_click">
+    </div>
+
+    <div class="col mb-2">        
+      <label class="form-check-label">
+        First Time Load:
+      </label>    
+      <input class="form-check-input" formControlName="first_time" type="checkbox" id="first_time">
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Z - Index:</label>
+      <input pattern="[0-9]*" class="form-control" formControlName="z_index" type="text" value="" required placeholder="Enter Layer Id" [class.is-invalid]="this.reactiveForm.controls.z_index.invalid && (this.reactiveForm.controls.z_index.dirty || this.reactiveForm.controls.z_index.touched)">
+      <div *ngIf="this.reactiveForm.controls.z_index.invalid && (this.reactiveForm.controls.z_index.dirty || this.reactiveForm.controls.z_index.touched)" class="invalid-feedback">
+        <div *ngIf="this.reactiveForm.controls.z_index.errors?.['required']">
+          This field is required.
+        </div>
+        <div *ngIf="this.reactiveForm.controls.z_index.errors?.['pattern']">
+          This field must be a number.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-2 d-grid">
+      <button type="button" class="btn btn-sm btn-primary" (click)="validate()">Submit</button>
+    </div>
+  </div>
+</form>
+
+</kendo-dialog>
+
+<kendo-dialog class="custom-dialog handler-dialog" title="Edit" *ngIf="editDialog" [minWidth]="250" [width]="1024"
+  (close)="closeEditDialog()">
+
+  <form [formGroup]="DataFormDetail">
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Asset Id:</label>
+      <input class="form-control" formControlName="cctv_asset_id" type="text" value="" placeholder="Enter Asset Id">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Location Name:</label>
+      <input class="form-control" formControlName="location_name" type="text" value="" placeholder="Enter Location">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Junction Type:</label>
+      <input class="form-control" formControlName="junction_type" type="text" value=""
+        placeholder="Enter Junction Type">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-2">
+      <label for="name" class="form-label">Police Sytation Name:</label>
+      <input class="form-control" formControlName="pstation_name" type="text" value=""
+        placeholder="Enter PoliceStation">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-2 d-grid">
+      <button class="btn btn-sm btn-primary" (click)="add_bim_data_to_db($event)" type="button">Submit</button>
+    </div>
+  </div>
+  </form>
+
+
+</kendo-dialog>
+
+<!-- <kendo-dialog class="custom-dialog handler-dialog" title="Edit" *ngIf="selectFeatureDialog" [minWidth]="250" [width]="1024" (close)="closeFeatureDialog()">
+  <h4>Select Feature</h4>
+</kendo-dialog> -->
+
+ <!-- <button type="button" (click)="openEditDialog()">OPEN</button> -->
+<button type="button" (click)="getBimData()">GET</button>
+<div class="SubCursorBar">
+  <div class="content">
+    <div class="DisabledContent" is-disabled="false">
+      <div class="CursorBarControl" is-disabled="false" is-selected="true" title="Pan">
+        <!-- <div class="icon">
+          <svg class="" width="42" height="42" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.5652 6C14.9172 6 14.3913 6.51692 14.3913 7.15385V14.4615H13.6087V8.69231C13.6087 8.05538 13.0828 7.53846 12.4348 7.53846C11.7868 7.53846 11.2609 8.05538 11.2609 8.69231V14.4615V16.7692V19.6734C11.2609 19.6734 9.0069 18.2402 7.87211 17.7548C7.55594 17.6194 7.22575 17.5385 6.89079 17.5385C5.1401 17.5385 5 19.0769 5 19.0769L8.13043 21.3846L10.6357 24.3398C11.5279 25.3922 12.85 26 14.243 26H19.8696C21.5983 26 23 24.6223 23 22.9231V14.4615V11C23 10.3631 22.4741 9.84615 21.8261 9.84615C21.1781 9.84615 20.6522 10.3631 20.6522 11V14.4615H19.8696V8.69231C19.8696 8.05538 19.3437 7.53846 18.6957 7.53846C18.0477 7.53846 17.5217 8.05538 17.5217 8.69231V14.4615H16.7391V7.15385C16.7391 6.51692 16.2132 6 15.5652 6Z" fill="white"></path>
+          </svg>
+        </div> -->
+        <mat-button-toggle-group name="ingredients" aria-label="Ingredients">
+          <mat-button-toggle (click)="goto_location()" title="Pan"><i class="fas fa-map-marker-alt fa-2x"></i></mat-button-toggle>
+          <mat-button-toggle (click)="measurementType($event)" title="Measure polyline"><mat-icon>timeline</mat-icon></mat-button-toggle>
+          <mat-button-toggle title="Measure polygon" (click)="measurementType($event)"><i class="fas fa-draw-polygon fa-2x"></i></mat-button-toggle>
+            <mat-button-toggle title="info" (click)="featureInfo()"><mat-icon>info</mat-icon></mat-button-toggle>
+            <mat-button-toggle title="Take Screenshot" (click)="takeSS()"><i class="fas fa-camera-retro fa-2x"></i></mat-button-toggle>
+            <mat-button-toggle title="3d Data Info" (click)="infoOf3DData()" ><i class="fas fa-question-circle fa-2x"></i></mat-button-toggle>
+            <mat-button-toggle (click)="clearAllMeasurementData()" title="Erase"><i class="fas fa-eraser fa-2x"></i></mat-button-toggle>
+            <mat-button-toggle  [matMenuTriggerFor]="menu" title="Add"><i class="fas fa-plus fa-2x"></i></mat-button-toggle>
+            <mat-menu #menu="matMenu">
+              <form [formGroup]="bimDataForm">
+                <mat-form-field>                  
+                  <select formControlName="feature_name" #feature (click)="add_bim_data($event)" matNativeControl required>
+                    <option value="">Select</option>
+                    <option value="car">Car</option>
+                    <option value="street_light">Street Light</option>
+                    <option value="cctv">CCTV</option>
+                    <option value="smart_pole">Smart Pole</option>
+                  </select>
+                </mat-form-field>
+              </form>
+            </mat-menu>
+            <!-- <mat-button-toggle title="Download Image" ><i class="fas fa-camera fa-2x"></i></mat-button-toggle> -->
+        </mat-button-toggle-group>
+      </div>
+    </div>
+  </div>
+</div>
+<table id="property_tbl" class="table table-striped" style="display: block;">
+  <thead>
+    <tr>
+      <th scope="col">Sr.no</th>
+      <th scope="col">Field</th>
+      <th scope="col">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (property of property_data; track property_data.value; let i = $index) {
+    <tr>
+      <th scope="row">{{ i + 1 }}</th>
+      <td>{{ property.value }}</td>
+      <td>{{ property.field }}</td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+<!-- <table id="property_tbl" class="table table-striped" style="display: block;">
+  <tbody>
+    @for (property of gridInfoKeys; track gridInfoKeys; let i = $index) {
+    <tr>
+      <th scope="row">{{ [gridInfoKeys [i] ] }}</th>
+      <td>{{ gridarr[property] }}</td>      
+    </tr>
+    }
+  </tbody>
+</table> -->
+
+<button type="button" class="cesium-button">
+  <label>
+    <input type="checkbox" id="per_selection" (click)="per_selection()">Per-feature selection </label>
+</button>
+<!-- <mat-form-field>
+  <mat-label>Favorite food</mat-label>
+  <mat-select>
+    @for (food of foods; track food) {
+    <mat-option [value]="food.value">{{food.viewValue}}</mat-option>
+    }
+  </mat-select>
+</mat-form-field> -->
+
+<mat-slide-toggle (change)="changeBaseLayer()" id="slider" color="#76ee59"> 
+  {{galleryImg}} 
+</mat-slide-toggle>
+<button (click)="rotateEntity(modelEntity, -5);">Rotate Left</button>
+<button (click)="rotateEntity(modelEntity, 5);">Rotate Right</button>
+<button (click)="getFeature()">Done</button>
+<button (click)="UpdateFeature()">Update</button>
+<!-- <mat-form-field class="dd_state">
+  <mat-label>Select State Name</mat-label>
+  <mat-select (selectionChange)="get_layer_by_state_id($event)">
+
+    <ng-container *ngIf="dropDownData">
+      <mat-option [value]="data.state_id" *ngFor="let data of dropDownData.data"
+        [attr.state_id]="data.state_id">{{data.city}}</mat-option>
+    </ng-container>
+
+
+  </mat-select>
+</mat-form-field> -->
+
+<!-- <button type="button" (click)="togglePanel()">Layer</button> -->
+
+<div class="row closed-panel" [@widthGrow]="state">
+  <div class="col-sm-12">
+
+    <div class="layer-popup resize-popup" id="layers">
+      <div class="layers" id="layersheader">
+        <div class="layer-title-main w-100 align-items-center">
+          <h3 class="layer-title me-auto">
+            <label id="total_layer_cnt" style="color: aliceblue;" data-translate="_layer_popup">Layer</label>
+          </h3>
+
+          <a class="layer-close side-layer-resize ms-2 me-2" href="javascript:void(0);">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+              id="Layer_1" x="0px" y="0px" width="16" height="16" viewBox="0 0 50 50" enable-background="new 0 0 50 50"
+              xml:space="preserve">
+              <g>
+                <g>
+
+                  <polyline fill-rule="evenodd" clip-rule="evenodd" fill="none" stroke="#FFFFFF" stroke-width="3.5"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="22.9256"
+                    points="    47.5,1.832 22.191,27.15 22.191,16.419   " />
+
+                  <line fill-rule="evenodd" clip-rule="evenodd" fill="none" stroke="#FFFFFF" stroke-width="3.5"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="22.9256" x1="22.191" y1="27.15"
+                    x2="32.919" y2="27.15" />
+                </g>
+
+                <polyline fill-rule="evenodd" clip-rule="evenodd" fill="none" stroke="#FFFFFF" stroke-width="3.5"
+                  stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="22.9256"
+                  points="   44.878,18.451 44.878,48.168 2.5,48.168 2.5,5.802 31.722,5.802  " />
+              </g>
+            </svg>
+          </a>
+
+        </div>
+        <div class="layer-content" id="layer_master">
+          <div class="accordion" id="accordionExample">
+            <div *ngFor="let parentLayer of data">
+              <div class='accordion-item'>
+                <h2 class='accordion-header'>
+                  <button class='accordion-button collapsed' type='button'
+                    (click)="toggleCollapse(parentLayer.parent_layer_id)">
+                    {{ parentLayer.parent_layer_name }}
+                  </button>
+                </h2>
+                <div [id]="'panelsStayOpen-collapse' + parentLayer.parent_layer_id" class='accordion-collapse collapse'>
+                  <div class='accordion-body'>
+                    <div *ngFor="let childLayer of parentLayer.child_layer">
+
+                      <div class="form-check">
+                        <input class="form-check-input" name="child_layer_name" (change)="showHideData($event)"
+                          [attr.mobile_service_url]="childLayer.mobile_service_url"
+                          [attr.parent_layer]="childLayer.parent_layer" [attr.defination]="childLayer.defination"
+                          [attr.layer_name]="childLayer.layer_name"
+                          [attr.combined_service]="childLayer.is_combined_service"
+                          [attr.service-url]="childLayer.service_url" [attr._id]="childLayer.geometry_type"
+                          data-id="Image" type="checkbox" [attr.value]="childLayer.layer_id"
+                          [attr.Id]="'flexCheckDefault' + childLayer.layer_id"
+                          [attr.layer_name]="childLayer.layer_name">
+                        <label class="form-check-label">{{ childLayer.layer_name }}</label>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+--------------
+
+
+.layer-popup.resize-layer .side-layer-resize svg {
+  transform: rotate(180deg);
+}
+
+.closed-panel {
+  overflow-y: hidden;
+} 
+
+
+// .CursorBarControl {
+//   background-color: #ffffff; /* Set the default background color */
+//   cursor: pointer; /* Change cursor to pointer on hover */
+//   padding: 10px;
+//   margin: 5px;
+//   border-radius: 5px;
+// }
+.CursorBarControl.clicked {
+  background-color: #ff0000; /* Set the background color when clicked */
+}
+
+#per_selection{
+  position: relative;
+  bottom: 2px;
+  right: 4px;
+}
+
+// .mat-button-toggle{
+//   background-color: #306cee;
+//   color: #ffffff;
+// }
+
+#slider{
+  position: relative;
+  bottom: 818px;
+  right: 163px;
+}
+
+
+.mat-slide-toggle:checked{
+
+  background-color: green;
+
+}
+
+
+
+.mat-button-toggle:hover {
+  background-color: transparent;
+  color: #1dd9cd !important;    
+}
+
+.mat-button-toggle-checked {
+  //background-color: #ec2c4c;
+  color: #1dd9cd !important;
+}
+
+
+.cesium-button{
+  top: -853px;
+  left: 8px;
+  border-radius: 3px;
+}
+
+.cesium-viewer-bottom{
+  display: none;
+}
+
+#mat-mdc-slide-toggle-1-label {
+  color: black;
+  font-weight: 500;
+}
+
+::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: #76ee59 !important;
+}
+
+.dd_state{
+  position: relative;
+  bottom: 772px;
+  right: 287px;
+}
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: #3f4d67 !important;
+}
+
+.SubCursorBar{
+  position: relative;
+    top: -786px;
+    left: 10px;
+
+}
+
+#popupBox {
+  background-color: #333;
+  border: 1px solid #fff;
+  padding: 10px;
+  color: #fff;
+}
+
+.doc-title {
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 2rem 0;
+  margin: 5rem 0 2rem;
+  text-transform: uppercase;
+ }
+
+.SubCursorBar>.content {
+  align-items: center;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  background: rgba(33, 39, 42, .8);
+  border-radius: 9px;
+  box-shadow: 0 0 1px rgba(18,22,25,.36), 0 18px 36px -4px rgba(18,22,25,.36);
+  display: flex;
+  pointer-events: auto;
+  width: -webkit-max-content;
+  width: max-content;
+}
+
+.layer-popup {
+  width: 320px;
+  position: absolute; /* Change to absolute */
+  bottom: 33px;
+  right: 0; /* Position on the right side */
+  z-index: 10;
+  background: #fff;
+  transition: all .8s ease-in-out;
+  /**/
+  height: 450px;
+}
+
+.layer-popup.active {
+  right: 0;
+}
+
+.layer-popup.resize-layer {
+  height: 45px;
+}
+
+.layer-popup.resize-layer .side-layer-resize img {
+  transform: rotate(180deg);
+}
+
+.layer-title{
+  background-color: #3F4D67;
+  height: 38px;
+}
+
+.accordion-button{
+  height: 40px;
+}
+
+.layer-content {
+  width: 100%;
+  height: calc(100% - 45px);
+  overflow-y: auto;
+  padding: 10px;
+  position: absolute;
+  border-bottom: 1px solid #f3f3f3;
+  border-left: 1px solid #f3f3f3;
+  bottom: 1px;
+}
+
+.cesium-infoBox{
+  display: none !important;
+}
+
+#property_tbl{
+  position: relative;
+  
+    // display: block;
+    // bottom: 836px;
+    // left: 1386px;
+
+}
+
+@media only screen and (min-width: 320px) and (max-width: 620px) {
+  .layer-popup {
+    bottom: 0;
+    position: absolute; /* Change to absolute */
+    right: 0; /* Position on the right side */
+    height: calc(100vh - 150px);
+    z-index: 12;
+  }
+}
+-------------------------------------------------------------------------------------------------------------------------
+				
