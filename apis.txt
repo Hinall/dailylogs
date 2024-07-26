@@ -8114,4 +8114,265 @@ export default class _3D implements OnInit {
   }
 }
 -------------------------------------------------------------------------------------------------------------------------
-				
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_____________________________________________________________________________________________________________15/7/24
+cd C:\Users\hinal.panchal\Downloads\keycloak-25.0.1\keycloak-25.0.1\bin
+kc.bat start-dev
+
+Keycloak is running on http://0.0.0.0:8080.
+The management interface is available at http://0.0.0.0:9000.
+
+Admin User Cred
+admin
+admin@123
+
+crete realm
+create client-[openid-connect,myapp]
+create user [hinal,hinal@gmail.comhinal@gmail.com,hinal@123][amnex,amnex@gmail.com,amnex@123]
+create client role[ADMIN,USER]
+create realm roles[realm_admin,realm_user ]--> add associated roles-->make composite=true
+	
+db=postgres  
+db-url-host=localhost
+db-url-database=keycloak_db
+db-url-port=5432
+db-username=postgres
+db-password=postgres
+
+
+_____________________________________________________________________________________________________________________________________26/7/24
+
+import { Component, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import Map from "@arcgis/core/Map";
+import MapView from "@arcgis/core/views/MapView";
+import Graphic from '@arcgis/core/Graphic';
+import Point from '@arcgis/core/geometry/Point';
+import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import PopupTemplate from '@arcgis/core/PopupTemplate';
+
+@Component({
+  selector: 'app-map',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './map.component.html',
+  styleUrls: ['./map.component.css']
+})
+export class MapComponent implements AfterViewInit {
+
+
+  ngAfterViewInit(): void {
+    const map = new Map({
+      basemap: 'satellite'
+    });
+
+    const view = new MapView({
+      container: 'viewDiv',
+      map: map,
+      center: [-118.80543, 34.02700],
+      zoom: 13 // Set zoom level
+    });
+
+    // Create a point graphic with a popup template
+    const point = new Point({
+      longitude: -118.80543,
+      latitude: 34.02700
+    });
+
+    const markerSymbol = new SimpleMarkerSymbol({
+      color: [226, 119, 40],
+      outline: {
+        color: [255, 255, 255],
+        width: 2
+      }
+    });
+
+    const pointGraphic = new Graphic({
+      geometry: point,
+      symbol: markerSymbol,
+      attributes: {
+        Name: 'Example Point',
+        Type: 'Type A',
+        Description: 'Description of the point',
+        Address: '123 Example St',
+        OtherField: 'Other information'
+      }
+    });
+
+    view.graphics.add(pointGraphic);
+
+    // Add FeatureLayer to map without PopupTemplate
+    const featureLayer = new FeatureLayer({
+      url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Hurricanes/MapServer/1',
+      outFields: ["*"],
+        minScale: 0,
+        maxScale: 0,
+        popupTemplate: {
+          content: this.mypopup.bind(this)}
+
+    });
+
+
+
+    map.add(featureLayer);
+
+    // Set up the click event to show the popup
+    view.on('click', (event) => {
+      view.hitTest(event).then((response: any) => {
+        const results = response.results;
+        if (results.length) {
+          const hit = results[0];
+          if (hit.graphic) {
+            const graphic = hit.graphic as Graphic;
+            const attributes = graphic.attributes;
+            console.log(`Clicked graphic: ${JSON.stringify(graphic)}`);
+          }
+        } else {
+          console.log('No features found at this location.');
+        }
+      }).catch((error: any) => {
+        console.error('Error during hitTest:', error);
+      });
+    });
+  }
+  mypopup(feature_layer:any){
+    // Create a dynamic PopupTemplate
+    const attrubute=feature_layer.graphic.attributes
+    const dynamicPopupTemplate = new PopupTemplate({
+      title: `Feature ID: ${attrubute['OBJECTID'] || 'Unknown'}`,
+      content: `
+        <b>Geometry:</b> ${JSON.stringify(feature_layer.graphic.geometry)} <br>
+        <b>Attributes:</b> ${JSON.stringify(feature_layer.attributes)}
+      `
+    });
+  }
+}
+___________________________________________________
+import { Component, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import Map from "@arcgis/core/Map";
+import MapView from "@arcgis/core/views/MapView";
+import Graphic from '@arcgis/core/Graphic';
+import Point from '@arcgis/core/geometry/Point';
+import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import PopupTemplate from '@arcgis/core/PopupTemplate';
+
+@Component({
+  selector: 'app-map',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './map.component.html',
+  styleUrls: ['./map.component.css']
+})
+export class MapComponent implements AfterViewInit {
+
+  ngAfterViewInit(): void {
+    const map = new Map({
+      basemap: 'satellite'
+    });
+
+    const view = new MapView({
+      container: 'viewDiv',
+      map: map,
+      center: [-118.80543, 34.02700],
+      zoom: 13 // Set zoom level
+    });
+
+    // Create a point graphic with a popup template
+    const point = new Point({
+      longitude: -118.80543,
+      latitude: 34.02700
+    });
+
+    const markerSymbol = new SimpleMarkerSymbol({
+      color: [226, 119, 40],
+      outline: {
+        color: [255, 255, 255],
+        width: 2
+      }
+    });
+
+    const pointGraphic = new Graphic({
+      geometry: point,
+      symbol: markerSymbol,
+      attributes: {
+        Name: 'Example Point',
+        Type: 'Type A',
+        Description: 'Description of the point',
+        Address: '123 Example St',
+        OtherField: 'Other information'
+      }
+    });
+
+    view.graphics.add(pointGraphic);
+
+    // Add FeatureLayer to map with PopupTemplate
+    const featureLayer = new FeatureLayer({
+      url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Hurricanes/MapServer/1',
+      outFields: ["*"],
+      minScale: 0,
+      maxScale: 0,
+      popupTemplate: {
+        title: '{OBJECTID}',
+        content: this.mypopup.bind(this)
+      }
+    });
+    map.add(featureLayer);
+  }
+
+  mypopup(feature: any): string {
+    // Create dynamic popup content
+    const attributes = feature.graphic.attributes;
+    const geometry = feature.graphic.geometry;
+    let content = '<b>Attributes:</b><br>';
+
+    for (const key in attributes) {
+      if (attributes.hasOwnProperty(key)) {
+        content += `${key}: ${attributes[key]}<br>`;
+      }
+    }
+
+    content += `<br><b>Geometry:</b><br>${JSON.stringify(geometry)}`;
+
+    return content;
+  }
+}
+
+
+			
