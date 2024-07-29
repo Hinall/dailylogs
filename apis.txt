@@ -8149,6 +8149,7 @@ export default class _3D implements OnInit {
 
 
 
+
 _____________________________________________________________________________________________________________15/7/24
 cd C:\Users\hinal.panchal\Downloads\keycloak-25.0.1\keycloak-25.0.1\bin
 kc.bat start-dev
@@ -8460,4 +8461,9 @@ public class ExcelService {
 
 
 
-			
+
+_________________________________________________23/7/24
+
+https://medium.com/@ramanamuttana/connect-keycloak-with-postgresql-
+				
+
