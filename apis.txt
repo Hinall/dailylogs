@@ -8466,4 +8466,255 @@ _________________________________________________23/7/24
 
 https://medium.com/@ramanamuttana/connect-keycloak-with-postgresql-
 				
+_--__________________________________________________________________________________29/7/24
+package com.bezkoder.spring.jpa.postgresql.service;
+
+
+	
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class ExcelService {
+
+	  @Autowired
+	    private JdbcTemplate jdbcTemplate;
+	  
+    private final ObjectMapper objectMapper;
+
+    public ExcelService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public String convertMultipleExcelFilesToJson(MultipartFile[] files) throws IOException {
+        List<String> jsonResults = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            Workbook workbook = WorkbookFactory.create(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            List<String> excelData = new ArrayList<>();
+            Row headerRow = sheet.getRow(0);
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                Map<String, String> rowData = new HashMap<>();
+
+                for (int j = 0; j < row.getLastCellNum(); j++) {
+                    Cell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    String header = headerRow.getCell(j).getStringCellValue();
+                    String cellValue = cell.toString();
+                    if (header.equals("Property Address")) {
+                        cellValue = cellValue.replace("\"", "");
+                        cellValue = cellValue.replace("'", "");
+                    }
+                    if (cellValue.trim().isEmpty()) {
+                        cellValue = "null";
+                    }
+                    rowData.put(header, cellValue);
+                }
+
+                // Convert row data to JSON string
+                String json_row = objectMapper.writeValueAsString(rowData);
+                excelData.add(json_row);
+               
+            }
+            System.out.println("excel-------------------------------"+excelData);
+            // Convert the list of row JSON strings to a single JSON string
+//            String jsonResult = excelData;
+//            jsonResults.add(jsonResult);
+            jsonResults.addAll(excelData);
+        }	
+        System.out.println("result-----------------------------"+jsonResults);
+        return jsonResults.toString();
+    }
+
+    public void saveJsonData(String jsonData) {
+        String sql = "CALL insert_excel_data_from_json(?)";
+        jdbcTemplate.update(sql, jsonData);
+    }
+}
+
+
+________________________________
+CREATE OR REPLACE FUNCTION public.save_excel(userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 100
+AS $BODY$
+DECLARE
+    -- Declare variables for storing JSON values
+    _Approval_Rejection_Remarks text;
+    _GIS_ID numeric;
+    _Property_No text;
+    _Block_No numeric;
+    _Owner_Name text;
+    _Tenant_Name text;
+    _Property_Usage_Cat text;
+    _Factor4_Type text;
+    _Mobile_No text;
+    _Property_Address text;
+    _longitude numeric;
+    _latitude numeric;
+    _Water_Connection_Exists text;
+    _No_of_Water_Connection numeric;
+    _Water_Tax_Bill text;
+    _Professional_Tax text;
+    _Survey_Remark text;
+
+
+    --userJsonArray json[];
+    --userJsonObject json;
+	
+	jsonObject json;
+	userJsonData json;
+	jsonObjectInner json;
+	i json;
+	sql_query text;
+BEGIN
+  
+	-- select * from tbl_error_log 
+	--userJsonArray=cast(userjson as json[]);
+	
+	
+	jsonObject := cast(userjson  AS JSON) :: JSON;
+	userJsonData := cast(jsonObject ->> 'data' AS JSON) :: JSON;
+		 
+        FOR i IN SELECT * FROM json_array_elements(userJsonData )
+        LOOP
+			--raise notice '%',i;
+			jsonObjectInner := cast(i AS JSON) :: JSON;
+			
+			    _Approval_Rejection_Remarks := COALESCE(jsonObjectInner ->> 'Approval / Rejection Remarks', '');
+        _GIS_ID := COALESCE(NULLIF(jsonObjectInner ->> 'GIS ID', 'null')::numeric, 0);
+        _Property_No := COALESCE(jsonObjectInner ->> 'Property No', '');
+        _Block_No := COALESCE(NULLIF(jsonObjectInner ->> 'Block No', 'null')::numeric, 0);
+        _Owner_Name := COALESCE(jsonObjectInner ->> 'Owner Name', '');
+        _Tenant_Name := COALESCE(jsonObjectInner ->> 'Tenant Name', '');
+        _Property_Usage_Cat := COALESCE(jsonObjectInner ->> 'Property Usage Cat', '');
+        _Factor4_Type := COALESCE(jsonObjectInner ->> 'Factor4 Type', '');
+        _Mobile_No := COALESCE(jsonObjectInner ->> 'Mobile No', '');
+        _Property_Address := COALESCE(jsonObjectInner ->> 'Property Address', '');
+        _longitude := COALESCE(NULLIF(jsonObjectInner ->> 'longitude', 'null')::numeric, 0);
+        _latitude := COALESCE(NULLIF(jsonObjectInner ->> 'latitude', 'null')::numeric, 0);
+        _Water_Connection_Exists := COALESCE(jsonObjectInner ->> 'Water Connection Exists', '');
+        _No_of_Water_Connection := COALESCE(NULLIF (jsonObjectInner ->> 'No of Water Connection', 'null')::numeric,0);
+        _Water_Tax_Bill := COALESCE(jsonObjectInner ->> 'Water Tax Bill', '');
+        _Professional_Tax := COALESCE(jsonObjectInner ->> 'Professional Tax', '');
+        _Survey_Remark := COALESCE(jsonObjectInner ->> 'Survey Remark', '');
+		
+		
+        RAISE NOTICE ' Approval_Rejection_Remarks=%', _Approval_Rejection_Remarks;
+        RAISE NOTICE ' GIS_ID=%', _GIS_ID;
+        RAISE NOTICE ' Property_No=%', _Property_No;
+        RAISE NOTICE ' Block_No=%', _Block_No;
+        RAISE NOTICE ' Owner_Name=%', _Owner_Name;
+        RAISE NOTICE ' Tenant_Name=%', _Tenant_Name;
+        RAISE NOTICE ' Property_Usage_Cat=%', _Property_Usage_Cat;
+        RAISE NOTICE ' Factor4_Type=%', _Factor4_Type;
+        RAISE NOTICE ' Mobile_No=%', _Mobile_No;
+        RAISE NOTICE ' Property_Address=%', _Property_Address;
+        RAISE NOTICE ' longitude=%', _longitude;
+        RAISE NOTICE ' latitude=%', _latitude;
+        RAISE NOTICE ' Water_Connection_Exists=%', _Water_Connection_Exists;
+        RAISE NOTICE ' No_of_Water_Connection=%', _No_of_Water_Connection;
+        RAISE NOTICE ' Water_Tax_Bill=%', _Water_Tax_Bill;
+        RAISE NOTICE ' Professional_Tax=%', _Professional_Tax;
+        RAISE NOTICE ' Survey_Remark=%', _Survey_Remark;
+
+			
+			RAISE NOTICE 'loop ';
+		INSERT INTO tbl_excel2 (
+    approval_rejection_remarks, 
+    gis_id, 
+    property_no, 
+    block_no, 
+    owner_name, 
+    tenant_name, 
+    property_usage_cat, 
+    factor4_type, 
+    mobile_no, 
+    property_address, 
+    longitude, 
+    latitude, 
+    water_connection_exists, 
+    no_of_water_connection, 
+    water_tax_bill, 
+    professional_tax, 
+    survey_remark
+) 
+VALUES (
+    _Approval_Rejection_Remarks,
+    _GIS_ID,
+    _Property_No,
+    _Block_No,
+    _Owner_Name,
+    _Tenant_Name,
+    _Property_Usage_Cat,
+    _Factor4_Type,
+    _Mobile_No,
+    _Property_Address,
+    _longitude,
+    _latitude,
+    _Water_Connection_Exists,
+    _No_of_Water_Connection,
+    _Water_Tax_Bill,
+    _Professional_Tax,
+    _Survey_Remark
+);
+sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'','' insert successfully created successfully'')::text as data;';
+
+
+		raise notice 'insert';
+		
+		END LOOP;
+
+   RETURN QUERY EXECUTE sql_query;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Capture and log the error
+        DECLARE
+            p_errormessage text;
+            p_errorstate text;
+            p_errorline text;
+        BEGIN
+            p_errormessage := SQLERRM;
+            p_errorstate := SQLSTATE;
+            GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+            -- Insert the error into the error log table
+            INSERT INTO tbl_error_log (error_name, error_callstack, error_method, created_on) 
+            VALUES (p_errorline, p_errormessage || ':fn_save_excel', p_errorstate, timezone('Asia/Kolkata', now()));
+
+            -- Build and return the error response
+            RETURN QUERY SELECT jsonb_build_object(
+                'responseCode', 201,
+                'data', 'failed',
+                'responseMessage', p_errormessage
+            )::text AS data;
+        END;
+END;
+$BODY$;
+
+ALTER FUNCTION public.save_excel(text)
+    OWNER TO postgres;
 
