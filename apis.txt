@@ -8718,3 +8718,76 @@ $BODY$;
 ALTER FUNCTION public.save_excel(text)
     OWNER TO postgres;
 
+________________________________________________________________________30/7/24
+CREATE OR REPLACE FUNCTION public.fn_excel_log(userjson text)
+    RETURNS TABLE(data text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 100
+AS $BODY$
+DECLARE
+	error_msg text;
+	jsonObject json;
+	jsondata json;
+	_filename  text;
+	_status    text;
+	_message   text;
+	_id numeric;
+
+	sql_query text;
+BEGIN
+	-- select * from tbl_error_log 
+	jsonObject := cast(userjson  AS JSON) :: JSON;
+	jsondata := cast(jsonObject ->> 'data' AS JSON) :: JSON;
+	_filename:=  COALESCE(jsondata ->> 'filename', '');
+ 	_status:=  COALESCE(jsondata ->> 'status', '');  
+	_message:=  COALESCE(jsondata ->> 'message', ''); 
+  
+	INSERT INTO public.tbl_excel_log(
+	 filename, status, message)
+	VALUES (_filename,_status,_message) returning id into _id ;
+	 
+	IF(_id)
+	THEN
+		 sql_query := 'SELECT json_build_object(''responseCode'',200,''responseMessage'','' insert successfully created successfully'')::text as data;';
+	ELSE
+			select error_callstact from tbl_error_log order by error_id desc limit 1 into error_msg;
+		   sql_query := 'SELECT json_build_object(''responseCode'',203,''responseMessage'','''||error_msg||''')::text as data;';
+	END IF;
+	
+   RETURN QUERY EXECUTE sql_query;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Capture and log the error
+        DECLARE
+            p_errormessage text;
+            p_errorstate text;
+            p_errorline text;
+        BEGIN
+            p_errormessage := SQLERRM;
+            p_errorstate := SQLSTATE;
+            GET STACKED DIAGNOSTICS p_errorline = PG_EXCEPTION_CONTEXT;
+
+            -- Insert the error into the error log table
+            INSERT INTO tbl_error_log (error_name, error_callstack, error_method, created_on) 
+            VALUES (p_errorline, p_errormessage || ':fn_excel_log', p_errorstate, timezone('Asia/Kolkata', now()));
+
+            -- Build and return the error response
+            RETURN QUERY SELECT jsonb_build_object(
+                'responseCode', 201,
+                'data', 'failed',
+                'responseMessage', p_errormessage
+            )::text AS data;
+        END;
+END;
+$BODY$;
+
+ALTER FUNCTION public.save_excel(text)
+    OWNER TO postgres;
+
+select fn_excel_log('{
+    "filename": "test",
+    "status": "true",
+    "message": "successful"
+}')
