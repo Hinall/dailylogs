@@ -8791,3 +8791,90 @@ select fn_excel_log('{
     "status": "true",
     "message": "successful"
 }')
+
+
+
+____________________________
+ 
+    
+    
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+        
+            try {for (MultipartFile file : files) {
+            	    try {
+            		
+                        File convFile = new File(file.getOriginalFilename());
+                        file.transferTo(convFile);
+                        String jsonData = excelService.convertExcelToJson(convFile);
+                        String insertResult = jdbcTemplate.queryForObject(SPUtility.INSERT_EXCEL, new Object[]{jsonData}, String.class);
+                                              
+                        JSONObject insertResult_obj = new JSONObject(insertResult);
+                  
+                        String file_name = file.getOriginalFilename();
+                        String message = insertResult_obj.data.message;
+                        boolean status = insertResult_obj.data.responsecode;
+
+                        Map<String, Object> logData = new HashMap<>();
+                        logData.put("filename", file_name);
+                        logData.put("status", status);
+                        logData.put("message", message);
+
+                        String logDataJson = objectMapper.writeValueAsString(logData);
+                        jdbcTemplate.queryForObject(SPUtility.INSERT_LOG, new Object[]{logDataJson}, String.class);
+                        return ResponseEntity.ok("Files processed successfully");
+                    	}
+            		
+            	catch(IOException | SQLException e) {
+            		
+            		  return ResponseEntity.status(500).body("Error processing file: " + file.getOriginalFilename());
+            	}
+
+            }
+        }
+             catch (IOException | SQLException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("failed");
+            }
+       
+    }
+
+	__________
+    public String convertExcelToJson(File file) throws IOException {
+        List<String> jsonResults = new ArrayList<>();
+
+        FileInputStream fis = new FileInputStream(file);
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        Row headerRow = sheet.getRow(0);
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            Map<String, String> rowData = new HashMap<>();
+
+            for (int j = 0; j < row.getLastCellNum(); j++) {
+                Cell cell = row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                String header = headerRow.getCell(j).getStringCellValue();
+                String cellValue = cell.toString();
+
+                // Handle special cases like removing quotes from Property Address
+                if ("Property Address".equals(header)) {
+                    cellValue = cellValue.replace("\"", "").replace("'", "");
+                }
+
+                // Convert empty cells to "null" string
+                if (cellValue.trim().isEmpty()) {
+                    cellValue = "null";
+                }
+
+                rowData.put(header, cellValue);
+            }
+
+            String jsonRow = objectMapper.writeValueAsString(rowData);
+            jsonResults.add(jsonRow);
+        }
+
+        workbook.close();
+        return jsonResults.toString();
+    }
